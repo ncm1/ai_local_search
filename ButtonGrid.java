@@ -15,6 +15,7 @@ public class ButtonGrid {
                 int min = 1;
                 int holder = 0;
                 int tempMax = 0;
+                int vert;
 
                 frame.setLayout(new GridLayout(width,length)); //set layout
 
@@ -39,7 +40,8 @@ public class ButtonGrid {
                     //Else add the random number to the grid
                     else
                     {
-                      grid[x][y] = new JButton(holder + ""); //creates new button
+                      vert = x*width + y;
+                      grid[x][y] = new JButton(holder + "{" + vert + "}"); //creates new button
                       puzzleArr[x][y] = holder;              //Add move to puzzle
                     }
                     frame.add(grid[x][y]); //adds button to grid
@@ -51,7 +53,8 @@ public class ButtonGrid {
                 frame.setVisible(true); //makes frame visible
 
                 printArr(puzzleArr);
-                //generateDigraph(puzzleArr, width);
+                //Create the digraph where the goal is located at n^2 - 1
+                generateDigraph(puzzleArr, width);
         }
 
         //For finding the max of {rmax - r, r - rmin, cmax - c, c - cmin}
@@ -81,6 +84,71 @@ public class ButtonGrid {
           }
           System.out.print("\n");
         }
+
+        public void generateDigraph(int[][] arr, int n){
+          Graph g = new Graph(n*n);
+
+          int currVertex;   //curr vertex stores the current vertex x*n + y
+          int legalJump;    //integer for storing the legal jump of curr vert
+          int rightChecker; //integer for checking the right side bounds
+          int leftChecker;  //integer for checking the left side bounds
+
+          //Declarations of integers for holding right,left,up, and down vertices
+          int rightVertex;
+          int leftVertex;
+          int upVertex;
+          int downVertex;
+
+          for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++ ){
+
+              currVertex = i * n + j;
+              legalJump  = arr[i][j]; //the legal jump for curr vertex
+
+              //Normalizing the the row to check if right/left are in bounds
+              rightChecker = currVertex - n*i;
+              leftChecker  = currVertex - n*i;
+
+              //Check whether up, down, left, or right are valid jumps
+              rightChecker += legalJump;
+              leftChecker  -= legalJump;
+              //setting rightvertex and left vertex to their positions if they
+              //are valid
+              rightVertex = currVertex + legalJump;
+              leftVertex  = currVertex - legalJump;
+
+              //Should fall within the bounds [0, n - 1] for the move to be valid
+              if( (rightChecker >= 0) && (rightChecker < n) ){
+                g.addEdge(currVertex, rightVertex, legalJump);
+                System.out.println("Moving right..." + legalJump);
+                System.out.println(currVertex + "->" + rightVertex);
+              }
+              if( (leftChecker >= 0) && (leftChecker < n) ) {
+                g.addEdge(currVertex, leftVertex, legalJump);
+                System.out.println("Moving left..." + legalJump);
+                System.out.println(currVertex + "->" + leftVertex);
+              }
+
+              upVertex   = currVertex - n * legalJump;
+              downVertex = currVertex + n * legalJump;
+              //Checking the conditions the vertices above and below current
+              //vertex are valid where the current vertexes can have values
+              // [ 0, (n^2 - 1)] ex: n = 5, [0, 24]
+              if( (upVertex >= 0) && (upVertex < n*n)) {
+                g.addEdge(currVertex, upVertex, legalJump);
+                System.out.println("Moving up..." + legalJump);
+                System.out.println(currVertex + "->" + upVertex);
+              }
+
+              if( (downVertex >= 0) && (downVertex < n*n)) {
+                g.addEdge(currVertex, downVertex, legalJump);
+                System.out.println("Moving down..." + legalJump);
+                System.out.println(currVertex + "->" + downVertex);
+              }
+          }
+        }
+        System.out.println("Directed Graph Created...");
+      }
 
         public static void main(String[] args) {
                 new ButtonGrid(5,5);//makes new ButtonGrid with 2 parameters
