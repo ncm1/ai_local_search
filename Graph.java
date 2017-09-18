@@ -9,12 +9,12 @@ public class Graph {
 		vertices = v;
 		list = new Node[v];
 		for(int i = 0; i < v; i++)
-		  list[i] = new Node() ;
+		  list[i] = new Node();
 	}
 
 	public void addEdge(int s,int d,int w){
-		Edge e1 = new Edge(s,d,w);
-		list[s].AdjacenyList.add(e1);
+		//Edge e1 = new Edge(s,d,w);
+		list[s].AdjacenyList.add(new Edge(s,d,w));
 	}
 
 	/*public void bfs(){

@@ -1,15 +1,22 @@
 import javax.swing.JFrame; //imports JFrame library
+import javax.swing.JPanel;
 import javax.swing.JButton; //imports JButton library
 import java.awt.GridLayout; //imports GridLayout library
 import java.util.*;
+import javax.swing.*;
 
-public class ButtonGrid {
+public class ButtonGrid extends JFrame {
 
-        JFrame frame=new JFrame(); //creates frame
+        //JFrame frame = new JFrame(); //creates frame
+        //JPanel frame = new JPanel();
         JButton[][] grid; //names the grid of buttons
         int[][] puzzleArr;
 
         public ButtonGrid(int width, int length){ //constructor
+                setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                JPanel frame = new JPanel();
+                frame.setLayout(null);
+
                 Random randy = new Random();
                 int max = width - 1;
                 int min = 1;
@@ -48,9 +55,10 @@ public class ButtonGrid {
                   }
                 }
 
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.pack(); //sets appropriate size for frame
-                frame.setVisible(true); //makes frame visible
+                //frame.pack(); //sets appropriate size for frame
+                getContentPane().add(frame);
+                //setVisible(true); //makes frame visible
+                setSize(800,600);
 
                 printArr(puzzleArr);
                 //Create the digraph where the goal is located at n^2 - 1
