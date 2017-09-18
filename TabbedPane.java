@@ -15,7 +15,6 @@ public class TabbedPane extends JFrame implements ActionListener
   StatsPane statsPane   = new StatsPane();
   PuzzlePane puzzlePane = new PuzzlePane();
   MovesPane movesPane   = new MovesPane();
-  BasicPuzzleMenu bpm   = new BasicPuzzleMenu();
   ButtonGrid bg;
 
   JButton cancel;
@@ -80,8 +79,6 @@ public class TabbedPane extends JFrame implements ActionListener
     tabPane.add("Statistics", statsPane);
 
 
-
-
     //Adding all the components together to create the JFrame
     this.add(tabPane);
     setSize(800,600);
@@ -111,7 +108,7 @@ public JPanel BasicPuzzleMenu() {
 
 
   //Setting the default text to display
-  sizeBox.setPrototypeDisplayValue("Choose a type of puzzle evaluation");
+  sizeBox.setPrototypeDisplayValue("Size");
   //Populate the sizebox with the possible puzzle sizes
   sizeBox.addItem(5);
   sizeBox.addItem(7);
@@ -119,13 +116,13 @@ public JPanel BasicPuzzleMenu() {
   sizeBox.addItem(11);
 
   //Add generate icon as a button on the gui
-  //ImageIcon generate_Icon  = new ImageIcon("icons/generate.gif");
-  generate = new JButton("Generate");
+  ImageIcon generate_Icon  = new ImageIcon("icons/generate.png");
+  generate = new JButton(generate_Icon);
 
-  generate.setBounds(520,400,180,70);
+  generate.setBounds(520,400,150,44);
   sizeBox.setBounds(500, 180, 50, 30);
-  prompt.setBounds(180, 95, 350, 200);
-
+  //prompt.setBounds(180, 95, 350, 200);
+  sizeBox.setBounds(180, 95, 350, 200);
   generate.addActionListener(this);
 
   //Add the title, prompt, sizebox, and generate icon to the interface

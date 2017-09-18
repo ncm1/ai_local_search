@@ -36,10 +36,10 @@ public class MainMenu extends JFrame implements ActionListener {
 
 
     //Add confirm icon as a button on the gui
-    ImageIcon confirm_Icon  = new ImageIcon("icons/confirm.gif");
+    ImageIcon confirm_Icon  = new ImageIcon("icons/confirm.png");
     confirm = new JButton(confirm_Icon);
 
-    confirm.setBounds(520,400,166,48);
+    confirm.setBounds(520,400,150,44);
     puzzleBox.setBounds(235, 150, 350, 200);
 
     confirm.addActionListener(this);

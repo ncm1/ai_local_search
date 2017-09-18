@@ -3,7 +3,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 
-public class BasicPuzzleMenu extends JPanel implements ActionListener{
+public class BasicPuzzleMenu extends JFrame implements ActionListener{
 
   JComboBox sizeBox  = new JComboBox();
   JButton   generate = new JButton("Generate");
