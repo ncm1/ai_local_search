@@ -16,6 +16,7 @@ public class TabbedPane extends JFrame implements ActionListener
   PuzzlePane puzzlePane = new PuzzlePane();
   MovesPane movesPane   = new MovesPane();
   ButtonGrid bg;
+  ButtonGrid puzzleMoves;
 
   JButton cancel;
   JButton confirm;
@@ -31,13 +32,6 @@ public class TabbedPane extends JFrame implements ActionListener
     //JPanel puzzle =
     //JPanel moves  =
     //JPanel stats  =
-
-    //JPanel foodPane      = foodPane();
-    //JPanel drinkPane     = drinkPane();
-    //JPanel appetizerPane = appetizerPane();
-    //JPanel dessertPane   = dessertPane();
-    //JPanel billPane      = billPane(total);
-
 
     //Set up JScrollPane for scrolling ability in the food Pane
     /*JScrollPane scrollFrame = new JScrollPane(foodPane,
@@ -197,14 +191,16 @@ public JPanel getPuzzleMenu(String selected)
         //JFrame bg = new  JFrame();
         bg = new ButtonGrid(n,n);
         tabPane.setComponentAt(1, bg.getContentPane());
-        //tabPane.setComponentAt(2,bg.getContentPane());
+        Graph g = bg.getGraph();
+        int sqr = n*n;
+        int[] visited = new int[sqr];
+        visited = g.bfs(0);
+
+        System.out.println("Visited length: " + visited.length);
+
+        puzzleMoves = new ButtonGrid(visited, n);
+        tabPane.setComponentAt(2,puzzleMoves.getContentPane());
     }
-
-
-    //Update each of the tabs here...
-    //JPanel newBillPane = billPane(total);
-    //tabPane.setComponentAt(4,newBillPane);
-
   }
 
 }

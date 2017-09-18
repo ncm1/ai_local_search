@@ -1,4 +1,4 @@
-
+import java.util.ArrayList;
 
 public class Graph {
 
@@ -14,30 +14,31 @@ public class Graph {
 
 	public void addEdge(int s,int d,int w){
 		//Edge e1 = new Edge(s,d,w);
-		list[s].AdjacenyList.add(new Edge(s,d,w));
+		list[s].AdjacencyList.add(new Edge(s,d,w));
 	}
 
-	/*public void bfs(){
-		bfs(0);
-	}*/
+	public int[] bfs(int s){
+		int visited[] = new int[vertices];
+		visited[s] = 1;
+		ArrayList<Integer> queue = new ArrayList<Integer>();
 
-	/*private void bfs(int s){
-		boolean visited[]=new boolean[vertices];
-		visited[s]=true;
-		ArrayList<Integer> queue=new ArrayList<Integer>();
-		while(!q.isEmpty())
+    queue.add(s);
+
+		while(!queue.isEmpty())
 		{
-			int next=queue.remove(0);
-			System.out.println("Visited "+next+"node");
-			for(int i=0;i<list[next].AdjacencyList.size();i++)
+			int next = queue.remove(0);
+			System.out.println("Visited node " + next);
+			for(int i = 0; i < list[next].AdjacencyList.size(); i++)
 			{
-				Edge e1=list[next].AdjacencyList.get(i);
-				if(!visited[e1.d])
+				Edge e1 = list[next].AdjacencyList.get(i);
+				if(visited[e1.destination] != 1)
 				{
-					visited[e1.d]=true;
-					queue.add(e1.d);
+					visited[e1.destination] = 1;
+					queue.add(e1.destination);
 				}
 			}
 		}
-	}*/
+    return visited;
+	}
+
 }

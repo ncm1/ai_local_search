@@ -46,9 +46,9 @@ public class BasicPuzzleMenu extends JFrame implements ActionListener{
     pane.add(sizeBox);
     pane.add(generate);
 
-    //getContentPane().add(pane);
+    getContentPane().add(pane);
     setSize(800,600);
-    setVisible(true);
+    //setVisible(true);
 }
 
   //*******************   Action Listener     **********************

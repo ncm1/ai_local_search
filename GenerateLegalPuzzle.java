@@ -4,7 +4,7 @@ public class GenerateLegalPuzzle{
 
 int[][] puzzleArr;
 
-public void generateLegalPuzzle(int n){
+public GenerateLegalPuzzle(int n){
   Random randy = new Random();
   int max = n - 1;
   int min = 1;

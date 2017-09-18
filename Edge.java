@@ -8,4 +8,8 @@ public class Edge {
     this.destination = d;
     this.legalMove   = legalMove;
   }
+
+  public int getDestination(){
+    return destination;
+  }
 }
