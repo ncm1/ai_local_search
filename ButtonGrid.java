@@ -1,60 +1,104 @@
 import javax.swing.JFrame; //imports JFrame library
+import javax.swing.JPanel;
 import javax.swing.JButton; //imports JButton library
 import java.awt.GridLayout; //imports GridLayout library
 import java.util.*;
+import javax.swing.*;
 
-public class ButtonGrid {
+public class ButtonGrid extends JFrame {
 
-        JFrame frame=new JFrame(); //creates frame
-        JButton[][] grid; //names the grid of buttons
-        int[][] puzzleArr;
+    JButton[][] grid; //names the grid of buttons
+    int[][] puzzleArr;
+    Graph g;
 
-        public ButtonGrid(int width, int length){ //constructor
-                Random randy = new Random();
-                int max = width - 1;
-                int min = 1;
-                int holder = 0;
-                int tempMax = 0;
-                int vert;
+    public ButtonGrid(int width, int length){ //constructor
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JPanel frame = new JPanel();
+        frame.setLayout(null);
 
-                frame.setLayout(new GridLayout(width,length)); //set layout
+        Random randy = new Random();
+        int max = width - 1;
+        int min = 1;
+        int holder = 0;
+        int tempMax = 0;
+        int vert;
 
-                grid      = new JButton[width][length]; //allocate the size of grid
-                puzzleArr = new int[width][length];
+        frame.setLayout(new GridLayout(width,length)); //set layout
 
-                for(int x = 0; x < length; x++)
+        grid      = new JButton[width][length]; //allocate the size of grid
+        puzzleArr = new int[width][length];
+
+        for(int x = 0; x < length; x++)
+        {
+            for(int y = 0; y < width; y++)
+            {
+                //Find the max legal jump
+                tempMax = getMaxLegalJump(x, y, max);
+                //get a random move that is valid in at least one direction
+                holder = randy.nextInt(tempMax - min + 1) + min;
+
+                //Check for the "Goal" condition
+                if(x == width - 1 && y == length - 1)
                 {
-                  for(int y = 0; y < width; y++)
-                  {
-                    //Find the max legal jump
-                    tempMax = getMaxLegalJump(x, y, max);
-                    //get a random move that is valid in at least one direction
-                    holder = randy.nextInt(tempMax - min + 1) + min;
-
-                    //Check for the "Goal" condition
-                    if(x == width - 1 && y == length - 1)
-                    {
-                        grid[x][y] = new JButton("G");       //Set goal to G
-                        puzzleArr[x][y] = 1000;
-                    }
-                    //Else add the random number to the grid
-                    else
-                    {
-                      vert = x*width + y;
-                      grid[x][y] = new JButton(holder + "{" + vert + "}"); //creates new button
-                      puzzleArr[x][y] = holder;              //Add move to puzzle
-                    }
-                    frame.add(grid[x][y]); //adds button to grid
-                  }
+                    grid[x][y] = new JButton("G");       //Set goal to G
+                    puzzleArr[x][y] = 0;
                 }
+                //Else add the random number to the grid
+                else
+                {
+                  vert = x*width + y;
+                  grid[x][y] = new JButton(holder + "{" + vert + "}"); //creates new button
+                  puzzleArr[x][y] = holder;              //Add move to puzzle
+                }
+                frame.add(grid[x][y]); //adds button to grid
+              }
+          }
 
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.pack(); //sets appropriate size for frame
-                frame.setVisible(true); //makes frame visible
+          //frame.pack(); //sets appropriate size for frame
+          getContentPane().add(frame);
+          //setVisible(true); //makes frame visible
+          setSize(800,600);
 
-                printArr(puzzleArr);
-                //Create the digraph where the goal is located at n^2 - 1
-                generateDigraph(puzzleArr, width);
+          printArr(puzzleArr);
+          //Create the digraph where the goal is located at n^2 - 1
+          generateDigraph(puzzleArr, width);
+        }
+
+        public ButtonGrid(int[] visited, int n)
+        {
+          setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+          JPanel frame = new JPanel();
+          frame.setLayout(null);
+
+          int vert;
+          int width  = n;
+          int length = n;
+
+          frame.setLayout(new GridLayout(width,length)); //set layout
+          grid      = new JButton[width][length]; //allocate the size of grid
+
+          for(int x = 0; x < length; x++)
+          {
+            for(int y = 0; y < width; y++)
+            {
+              if(x == 0 && y == 0)
+              {
+                  grid[x][y] = new JButton(0 + "");       //Set start to 0
+              }
+              //Else add the number of moves to the grid
+              else
+              {
+                vert = x*width + y;
+                if(visited[vert] != 0)
+                  grid[x][y] = new JButton(visited[vert] + ""); //creates new button
+                else
+                  grid[x][y] = new JButton("X");  //The location is not reachable
+              }
+              frame.add(grid[x][y]); //adds button to grid
+            }
+          }
+          getContentPane().add(frame);
+          setSize(800,600);
         }
 
         //For finding the max of {rmax - r, r - rmin, cmax - c, c - cmin}
@@ -86,7 +130,7 @@ public class ButtonGrid {
         }
 
         public void generateDigraph(int[][] arr, int n){
-          Graph g = new Graph(n*n);
+          g = new Graph(n*n);
 
           int currVertex;   //curr vertex stores the current vertex x*n + y
           int legalJump;    //integer for storing the legal jump of curr vert
@@ -147,12 +191,11 @@ public class ButtonGrid {
               }
           }
         }
-        System.out.println("Directed Graph Created...");
       }
 
-        public static void main(String[] args) {
-                new ButtonGrid(5,5);//makes new ButtonGrid with 2 parameters
-        }
+      public Graph getGraph(){
+        return g;
+      }
 }
 
 //Reference: http://www.wikihow.com/Make-a-GUI-Grid-in-Java
