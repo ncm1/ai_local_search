@@ -6,6 +6,7 @@ import java.util.*;
 public class MainMenu extends JFrame implements ActionListener {
 
   JComboBox sizeBox = new JComboBox();
+  JFormattedTextField hcTextBox = new JFormattedTextField(createFormatter("#######"));
   JButton next;
 
   public MainMenu() {
@@ -19,6 +20,7 @@ public class MainMenu extends JFrame implements ActionListener {
     //Setting the Title and location
     JLabel title = new JLabel("Puzzle Generator Main Menu");
     JLabel prompt = new JLabel("Please select the size of n:");
+    JLabel hillClimbingPrompt = new JLabel("Please select the number of iterations for hill-climbing approach:");
     title.setBounds(150,50,600,100);
 
     Font font = new Font("Cambria", Font.BOLD, 30);
@@ -39,6 +41,8 @@ public class MainMenu extends JFrame implements ActionListener {
     next.setBounds(520,400,180,70);
     sizeBox.setBounds(500, 180, 50, 30);
     prompt.setBounds(180, 95, 350, 200);
+    hillClimbingPrompt.setBounds(180,180,450,200);
+    hcTextBox.setBounds(600, 250, 100, 30);
 
     next.addActionListener(this);
 
@@ -47,9 +51,11 @@ public class MainMenu extends JFrame implements ActionListener {
     pane.add(prompt);
     pane.add(sizeBox);
     pane.add(next);
+    pane.add(hillClimbingPrompt);
+    pane.add(hcTextBox);
 
     getContentPane().add(pane);
-    setSize(800,600);
+    setSize(800,800);
     setVisible(true);
 }
 
@@ -60,13 +66,16 @@ public class MainMenu extends JFrame implements ActionListener {
 
     if(source == next){
       	int n = (int)sizeBox.getSelectedItem();
+        // need option for hill climbing
+        int hcNumIter = Integer.parseInt(hcTextBox.getText());
         setVisible(false);
         ButtonGrid bg = new ButtonGrid(n,n);
+        HillClimbing(bg, hcNumIter);
     }
   }
-public static void main(String[] args){
+  public static void main(String[] args){
   //Call the MainMenu to initialize program
   MainMenu menu = new MainMenu();
-}
+  }
 
 } //end class MainMenu

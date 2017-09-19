@@ -14,7 +14,7 @@ public class Graph {
 
 	public void addEdge(int s,int d,int w){
 		Edge e1 = new Edge(s,d,w);
-		list[s].AdjacenyList.add(e1);
+		list[s].AdjacencyList.add(e1);
 	}
 
 	/*public void bfs(){
