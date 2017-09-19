@@ -7,8 +7,6 @@ import javax.swing.*;
 
 public class ButtonGrid extends JFrame {
 
-    //JFrame frame = new JFrame(); //creates frame
-    //JPanel frame = new JPanel();
     JButton[][] grid; //names the grid of buttons
     int[][] puzzleArr;
     Graph g;
@@ -87,18 +85,19 @@ public class ButtonGrid extends JFrame {
               {
                   grid[x][y] = new JButton(0 + "");       //Set start to 0
               }
-              //Else add the random number to the grid
+              //Else add the number of moves to the grid
               else
               {
                 vert = x*width + y;
-                grid[x][y] = new JButton(visited[vert] + ""); //creates new button
+                if(visited[vert] != 0)
+                  grid[x][y] = new JButton(visited[vert] + ""); //creates new button
+                else
+                  grid[x][y] = new JButton("X");  //The location is not reachable
               }
               frame.add(grid[x][y]); //adds button to grid
             }
           }
-          //frame.pack(); //sets appropriate size for frame
           getContentPane().add(frame);
-          //setVisible(true); //makes frame visible
           setSize(800,600);
         }
 
@@ -192,16 +191,11 @@ public class ButtonGrid extends JFrame {
               }
           }
         }
-        System.out.println("Directed Graph Created...");
       }
 
       public Graph getGraph(){
         return g;
       }
-
-        public static void main(String[] args) {
-                new ButtonGrid(5,5);//makes new ButtonGrid with 2 parameters
-        }
 }
 
 //Reference: http://www.wikihow.com/Make-a-GUI-Grid-in-Java

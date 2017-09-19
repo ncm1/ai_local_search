@@ -11,7 +11,6 @@ public class MainMenu extends JFrame implements ActionListener {
   public MainMenu() {
 
     super("Puzzle Evaluation Main Menu");
-
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     JPanel pane = new JPanel();
     pane.setLayout(null);
@@ -34,19 +33,16 @@ public class MainMenu extends JFrame implements ActionListener {
     puzzleBox.addItem("Simulated Annealing");
     puzzleBox.addItem("Population Based Approach");
 
-
     //Add confirm icon as a button on the gui
     ImageIcon confirm_Icon  = new ImageIcon("icons/confirm.png");
     confirm = new JButton(confirm_Icon);
 
     confirm.setBounds(520,400,150,44);
     puzzleBox.setBounds(235, 150, 350, 200);
-
     confirm.addActionListener(this);
 
-    //Add the title, prompt, sizebox, and confirm icon to the interface
+    //Add the title, puzzleBox, and confirm icon to the interface
     pane.add(title);
-    //pane.add(prompt);
     pane.add(puzzleBox);
     pane.add(confirm);
 

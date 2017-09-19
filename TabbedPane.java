@@ -33,40 +33,7 @@ public class TabbedPane extends JFrame implements ActionListener
     //JPanel moves  =
     //JPanel stats  =
 
-    //Set up JScrollPane for scrolling ability in the food Pane
-    /*JScrollPane scrollFrame = new JScrollPane(foodPane,
-    ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    foodPane.setAutoscrolls(true);
-    scrollFrame.setPreferredSize(new Dimension( 800,600));
-    */
-    /*
-    //Set up JScrollPane for scrolling ability in the drink Pane
-    JScrollPane scrollFrame2 = new JScrollPane(drinkPane,
-    ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    drinkPane.setAutoscrolls(true);
-    scrollFrame2.setPreferredSize(new Dimension(800,600));
-
-    //Set up JScrollPane for scrolling ability in the drink Pane
-    JScrollPane scrollFrame3 = new JScrollPane(appetizerPane,
-    ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    appetizerPane.setAutoscrolls(true);
-    scrollFrame3.setPreferredSize(new Dimension(800,600));
-    */
-
-    //Add all the scrollFrames to the JPanel
-    //this.add(scrollFrame);
-    //this.add(scrollFrame2);
-    //this.add(scrollFrame3);
-
-    //Adding the tabs to the JPanel
-    //tabPane.add("Pane",  scrollFrame);
-    //tabPane.add("Pane Name", scrollFrame2);
-    //tabPane.add("Pane Name", scrollFrame3);
-    //tabPane.add("Pane Name", scrollFrame4);
-    //tabPane.add("Pane Name",  billPane);
+    //Adding the tabs to the JTabbedPane
     tabPane.add("Puzzle Initialization", initPane);
     tabPane.add("Puzzle", puzzlePane);
     tabPane.add("Puzzle Moves", movesPane);
@@ -99,7 +66,6 @@ public JPanel BasicPuzzleMenu() {
   title.setFont(font);
   Font font1 = new Font("Cambria", Font.BOLD, 20);
   prompt.setFont(font1);
-
 
   //Setting the default text to display
   sizeBox.setPrototypeDisplayValue("Size");
@@ -187,17 +153,15 @@ public JPanel getPuzzleMenu(String selected)
 
     if(source == generate){
         int n = (int)sizeBox.getSelectedItem();
-        //setVisible(false);
-        //JFrame bg = new  JFrame();
+
         bg = new ButtonGrid(n,n);
         tabPane.setComponentAt(1, bg.getContentPane());
+        //Getting the corresponding graph to create movesPane
         Graph g = bg.getGraph();
         int sqr = n*n;
         int[] visited = new int[sqr];
         visited = g.bfs(0);
-
-        System.out.println("Visited length: " + visited.length);
-
+        //Call ButtonGrid constructor to create the puzzle moves pane
         puzzleMoves = new ButtonGrid(visited, n);
         tabPane.setComponentAt(2,puzzleMoves.getContentPane());
     }
