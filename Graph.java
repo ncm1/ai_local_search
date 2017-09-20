@@ -44,62 +44,46 @@ public class Graph {
 
 	public int[] bfs(int s)
   {
+    //2D Auxilary matrix visited for keeping track of whether a vertex has been
+    //visited or not
 		int visited[] = new int[vertices];
+    //Set the source node as visited
 		visited[s] = 1;
-		ArrayList<Integer> queue = new ArrayList<Integer>();
+
+    //Creating 2 queues for keeping
+		ArrayList<Integer>  queue      = new ArrayList<Integer>();
     ArrayList<TreeNode> nodeQueue = new ArrayList<TreeNode>();
-    int counter = 0;
 
     TreeNode root = new TreeNode(s);
+    TreeNode currNode = null;
+    TreeNode newNode  = null;
 
     queue.add(s);
     nodeQueue.add(root);
 
-
-    TreeNode currNode = null;
-    TreeNode newNode;
-
-    int init = 1;
 		while(!queue.isEmpty())
 		{
 			int next = queue.remove(0);
       currNode = nodeQueue.remove(0);
-
-      /*if(init != 1)
-      {
-        currNode = new TreeNode(next);
-      }*/
-
-			// /System.out.println("Visited node " + next);
-
+      //System.out.println("visited node: " + next);
 			for(int i = 0; i < list[next].AdjacencyList.size(); i++)
 			{
 				Edge e1 = list[next].AdjacencyList.get(i);
 				if(visited[e1.destination] != 1)
 				{
+          //Create a new TreeNode that has not been visited
           newNode = new TreeNode(e1.destination);
+          //Set the new node as being visited and place it in the queue
 					visited[e1.destination] = 1;
-
+          //Adding new node to the queue as well as the TreeNode
 					queue.add(e1.destination);
           nodeQueue.add(newNode);
+          //Add the new node as the dequed nodes child
           currNode.addChild(newNode);
-          //System.out.println("Added node  " + e1.destination + " as child of " + next);
-          /*if(init == 1)
-          {
-            newNode = new TreeNode(e1.destination);
-            root.addChild(newNode);
-            System.out.println("Added " + newNode.getVertex() + " to root " + root.getVertex());
-          }
-          else
-          {
-            newNode = new TreeNode(e1.destination);
-            currNode.addChild(newNode);
-            System.out.println("Added " + newNode.getVertex() + " to currNode " + currNode.getVertex());
-            System.out.println("currNode.getChildren.size(): " + currNode.getChildren().size());
-          }*/
+
+          //System.out.println("Added node " + e1.destination + " to node " + currNode.getVertex());
 				}
 			}
-      init = 0;
 		}
 
     int vertexHasBeenVisited;
@@ -107,8 +91,8 @@ public class Graph {
 
     List<TreeNode> children = root.getChildren();
 
-    numberOfMoves = findDistance(root, 4);
-    System.out.println("Number of moves to 4: " + numberOfMoves);
+    //For loop goes through the visited array and replaces the vertices that
+    //have been visited with the number of moves it took to get there
     for(int j = 1; j < vertices; j++)
     {
       vertexHasBeenVisited = visited[j];
@@ -119,8 +103,7 @@ public class Graph {
         //Set the value in the visited array as the number of moves
         visited[j] = numberOfMoves;
       }
-    }
-
+    }//end for
     return visited;
   }
 }

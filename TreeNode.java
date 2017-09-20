@@ -6,7 +6,6 @@ public class TreeNode{
  private final List<TreeNode> children = new ArrayList<>();
 
  public TreeNode(int vertex) {
-  //this.parent = parent;
   this.vertex = vertex;
  }
 
