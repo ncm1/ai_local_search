@@ -4,6 +4,7 @@ import javax.swing.JButton; //imports JButton library
 import java.awt.GridLayout; //imports GridLayout library
 import java.util.*;
 import javax.swing.*;
+import java.io.*;
 
 public class ButtonGrid extends JFrame {
 
@@ -91,7 +92,6 @@ public class ButtonGrid extends JFrame {
 
             frame.setLayout(new GridLayout(width,length)); //set layout
 
-
             grid      = new JButton[width][length]; //allocate the size of grid
             compatabilityArr = new int[width][length]; //consequence of not generalizing things
 
@@ -114,7 +114,6 @@ public class ButtonGrid extends JFrame {
                     else
                     {
                       vert = x*width + y;
-                      //grid[x][y] = new JButton(holder + "{" + vert + "}");
                       grid[x][y] = new JButton(puzzleArr[vert] +""); //creates new button
                       compatabilityArr[x][y] = puzzleArr[vert];      //consequence of not generalizing things
                     }
@@ -177,11 +176,63 @@ public class ButtonGrid extends JFrame {
           evaluationFunction(visited,n);
         }
         /*
+        PRECONDITION:
+        POSTCONDITION:
+        */
+        public ButtonGrid(int[][] puzzleArr, int n)
+        {
+            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            JPanel frame = new JPanel();
+            frame.setLayout(null);
+
+            Random randy = new Random();
+            int width = n;
+            int length = width;
+            int max = width - 1;
+            int min = 1;
+            int holder = 0;
+            int tempMax = 0;
+            int vert;
+
+            frame.setLayout(new GridLayout(width,length)); //set layout
+
+            grid      = new JButton[width][length]; //allocate the size of grid
+
+            for(int x = 0; x < length; x++)
+            {
+                for(int y = 0; y < width; y++)
+                {
+                    //Find the max legal jump
+                    tempMax = getMaxLegalJump(x, y, max);
+                    //get a random move that is valid in at least one direction
+                    holder = randy.nextInt(tempMax - min + 1) + min;
+                    //Check for the "Goal" condition
+                    if(x == width - 1 && y == length - 1)
+                    {
+                        grid[x][y] = new JButton("G");       //Set goal to G
+                    }
+                    //Else add the random number to the grid
+                    else
+                    {
+                      grid[x][y] = new JButton(puzzleArr[x][y] +""); //creates new button
+                    }
+                    frame.add(grid[x][y]); //adds button to grid
+                  }
+              }
+              getContentPane().add(frame);
+              //setVisible(true); //makes frame visible
+              setSize(800,600);
+              //printArr(puzzleArr);
+            }
+        /*
         PRECONDITION: generateDigraph() is called
         POSTCONDITION: returns the most recently graph generated
         */
         public Graph getGraph(){
           return g;
+        }
+        public int[][] getPuzzleArr(){
+          return puzzleArr;
         }
         /*
         PRECONDITION: evaluationFunction() is called
@@ -223,20 +274,20 @@ public class ButtonGrid extends JFrame {
           //functions value to the minimum number of moves
           if( goalValue > 0)
           {
-            evaluationOutput = goalValue;
+            this.evaluationOutput = goalValue;
             return;
           }
           //Set/Reset unreachable to -1 corresponding to the unreachable
           //status of the goal cell
-          evaluationOutput = -1;
+          this.evaluationOutput = -1;
           for(int i = 1; i < visited.length -1; i++)
           {
             if(visited[i] == 0)
-              evaluationOutput -= 1;
+              this.evaluationOutput -= 1;
           }
         }//end evaluationFunction
 
-        /*For Debugging can be removed
+        //*For Debugging can be removed
         public void printArr(int[][] arr){
           for(int i = 0; i < arr[0].length; i++){
             for(int j = 0; j < arr[0].length; j++){
@@ -245,7 +296,20 @@ public class ButtonGrid extends JFrame {
             System.out.print("\n");
           }
           System.out.print("\n");
-        }*/
+        }
+
+        public void writeArr(PrintWriter file, int[][] arr)
+        {
+          for(int i = 0; i < arr[0].length; i++)
+          {
+            for(int j = 0; j < arr[0].length; j++)
+            {
+                file.write(arr[i][j] + " ");
+              }
+              file.write("\n");
+            }
+            file.write("\n");
+        }
 
         /*
         PRECONDITION: arr is a TWO DIMENSINAL INTEGER array of size n*n

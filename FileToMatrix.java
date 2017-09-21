@@ -19,24 +19,19 @@ public class FileToMatrix{
 
             ArrayList<Integer> puzzle = new ArrayList<Integer>();
 
-            while((line = bufferedReader.readLine()) != null) {
-                // /System.out.println(line);
+            while((line = bufferedReader.readLine()) != null)
+            {
+                //Split the line of values into seperate strings of ints
                 String[] values = line.split(" ");
+                //For loop for parsing each of the strings to Integers
                 for(int i =0; i < values.length; i++)
-                {
-                  //System.out.println(values[i]);
                   puzzle.add(Integer.parseInt(values[i]));
-                }
             }
 
-            //System.out.println("ArrayList size: " + puzzle.size());
-            // convert it to array
+            // convert it to array of Integer since we can't have ArrayList<int> :(
             Integer[] intArray = puzzle.toArray(new Integer[puzzle.size()]);
-
+            //Some weird Java 8 magic going on here...
             puzzleArr = Arrays.stream(intArray).mapToInt(Integer::intValue).toArray();
-            //int[]  puzzleArr = Arrays.stream(strArr).mapToInt(Integer::parseInt).toArray();
-            //String [] countries = list.toArray(new String[list.size()]);
-
             // Always close files.
             bufferedReader.close();
         }
@@ -49,8 +44,6 @@ public class FileToMatrix{
             System.out.println(
                 "Error reading file '"
                 + fileName + "'");
-            // Or we could just do this:
-            // ex.printStackTrace();
         }
     }
     /*
@@ -60,7 +53,6 @@ public class FileToMatrix{
         System.out.println(puzzleArr[i] + "");
     }
     */
-
     public int[] getPuzzleArr(){
       return puzzleArr;
     }

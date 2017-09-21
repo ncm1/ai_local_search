@@ -14,6 +14,7 @@ public class DataPane extends JPanel
 {
   JLabel title = new JLabel("Puzzle Data");
   JLabel evaluationFunc;
+  JLabel evaluationTimeLabel;
   JLabel prompt = new JLabel("Please select the size of n:");
 
     public DataPane()
@@ -47,6 +48,21 @@ public class DataPane extends JPanel
 
       add(evaluationFunc);
 
+    }
+
+    public DataPane(int evaluation, long evaluationTime)
+    {
+      Font font = new Font("Cambria", Font.BOLD, 30);
+      evaluationFunc = new JLabel("Evaluation function output: " + evaluation);
+      evaluationTimeLabel = new JLabel("Total Evaluation Time: " + evaluationTime + "ms");
+      evaluationFunc.setFont(font);
+      evaluationTimeLabel.setFont(font);
+
+      evaluationFunc.setBounds(520,400,180,70);
+      evaluationTimeLabel.setBounds(520, 700, 180, 70);
+
+      add(evaluationFunc);
+      add(evaluationTimeLabel);
     }
 
     public void paintComponent(Graphics g){
