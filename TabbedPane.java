@@ -496,13 +496,14 @@ public JPanel getPuzzleMenu(String selected) {
         float temp = initTemp;       
         
         //tabPane.setComponentAt(1, bg.getContentPane());
+        long startTime = System.currentTimeMillis();
+
         Random randy = new Random();
-        
         
         int val;
         bg = new ButtonGrid(n,n);
-    	 bg.evaluationFunction(bg.getGraph().bfs(0), n);
-    	
+    	  bg.evaluationFunction(bg.getGraph().bfs(0), n);
+    	  
         int prevVal = bg.getEvaluationOutput();
         
         ButtonGrid puzzleBG = bg; 
@@ -517,7 +518,7 @@ public JPanel getPuzzleMenu(String selected) {
 		        	 puzzleBG = bg;
 	        	 }
 	        	 else if ( val <= prevVal){ // if evaluation value of current puzzle config is lte than ev. value of previous puzzle config
-	        		 if (randy.nextFloat() < Math.exp((double)(prevVal - val )/temp)){ //  probability condition met
+	        		 if (randy.nextFloat() < Math.exp((double)(val - prevVal )/temp)){ //  probability condition met
 		        		  prevVal = val;
 		        		  puzzleBG = bg;
 	        		 }
@@ -528,12 +529,15 @@ public JPanel getPuzzleMenu(String selected) {
         	 temp = temp*decayRate; //apply decay to temp
            //System.out.println(temp);
        }
-        
+        long endTime = System.currentTimeMillis();
+        long evaluationTime = endTime - startTime;        
         tabPane.setComponentAt(1, puzzleBG.getContentPane());
         puzzleMoves = new ButtonGrid(puzzleBG.getGraph().bfs(0), n);
         tabPane.setComponentAt(2,puzzleMoves.getContentPane());
-        dataPane = new DataPane(puzzleMoves.getEvaluationOutput());
+        dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
         tabPane.setComponentAt(3,dataPane);
+
+
     }
       if(source == cancel)
       {
