@@ -59,9 +59,7 @@ public class MainMenu extends JFrame implements ActionListener {
     if(source == confirm){
       	String selected = (String)puzzleBox.getSelectedItem();
         setVisible(false);
-        System.out.println("selected: " + selected);
         TabbedPane tp = new TabbedPane(selected);
-        //ButtonGrid bg = new ButtonGrid(n,n);
     }
   }
 
