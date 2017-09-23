@@ -62,11 +62,19 @@ JTextField userField;
 JComboBox iterBox = new JComboBox();
 JButton basicHillGenerate;
 JButton simulatedAnnealingGenerate;
+JButton populationApproachGenerate;
 
 //JTextField initTempField = new JTextField();
 //JTextField tempDecayRateField = new JTextField();
 JComboBox initTempField = new JComboBox();
 JComboBox tempDecayRateField = new JComboBox();
+
+JComboBox iterEndTimeBox = new JComboBox();
+/*
+public JPanel PopulationPuzzleMenu(){
+
+}
+*/
 
 public JPanel SimulatedAnnealingPuzzleMenu() {
   JPanel pane = new JPanel();
@@ -182,7 +190,7 @@ public JPanel BasicPuzzleMenu() {
 
   basicGenerate.setBounds(520,400,150,44);
   cancel.setBounds(150,395,150,44);
-  sizeBox.setBounds(190, 95, 350, 200);
+  sizeBox.setBounds(190, 95, 150, 200);
   basicGenerate.addActionListener(this);
   cancel.addActionListener(this);
 
@@ -337,7 +345,7 @@ public JPanel getPuzzleMenu(String selected) {
   }
   //TODO: IMPLEMENT!
   else if(selected == "Population Based Approach"){
-    //puzzleMenuPanel = BasicPuzzleMenu();
+    //puzzleMenuPanel = PopulationPuzzleMenu();
     //return puzzleMenuPanel;
   }
   return puzzleMenuPanel;
@@ -412,13 +420,15 @@ public JPanel getPuzzleMenu(String selected) {
         i.printStackTrace();
         }
 
-        long startTime = System.currentTimeMillis();
+        
 
         int n    = (int)sizeBox.getSelectedItem();
         int iter = (int)iterBox.getSelectedItem();
 
+        long startTime = System.currentTimeMillis();
         bg = new ButtonGrid(n,n);
-        tabPane.setComponentAt(1, bg.getContentPane());
+        long endTime = System.currentTimeMillis();
+        long evaluationTime = endTime - startTime;
         //Getting the corresponding graph to create movesPane
         Graph g = bg.getGraph();
         int sqr = n*n;
@@ -446,6 +456,7 @@ public JPanel getPuzzleMenu(String selected) {
           //Generate the new directed graph and perform bfs
           bg.generateDigraph(hClimb.getNewPuzzle(), n);
           g = bg.getGraph();
+         
           //set visited to the set of puzzle moves and finally compare
           //the evaluation output
           visited = g.bfs(0);
@@ -466,22 +477,20 @@ public JPanel getPuzzleMenu(String selected) {
             //Set the new evaluation output
             maxEvalOutput = currEvalOutput;
             bg = new ButtonGrid(hClimb.getNewPuzzle(), n);
-            tabPane.setComponentAt(1, bg.getContentPane());
             //Call ButtonGrid constructor to create the puzzle moves pane
             puzzleMoves = new ButtonGrid(visited, n);
-            tabPane.setComponentAt(2,puzzleMoves.getContentPane());
+            
 
             dataPane = new DataPane(puzzleMoves.getEvaluationOutput());
-            tabPane.setComponentAt(3,dataPane);
             //bestPuzzleFile.createNewFile();
           }
 
-          maxEvalFile.println(maxEvalOutput);
+          //maxEvalFile.println(maxEvalOutput);
         }
         //Calculate the end time and the total time by subtracting end from start
-        long endTime = System.currentTimeMillis();
-        long evaluationTime = endTime - startTime;
 
+        tabPane.setComponentAt(1, bg.getContentPane());
+        tabPane.setComponentAt(2,puzzleMoves.getContentPane());
         dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
         tabPane.setComponentAt(3,dataPane);
         maxEvalFile.close();
@@ -493,7 +502,7 @@ public JPanel getPuzzleMenu(String selected) {
         int iter = (int)iterBox.getSelectedItem();
         float initTemp = (Float) initTempField.getSelectedItem();
         float decayRate = (Float) tempDecayRateField.getSelectedItem();
-        float temp = initTemp;       
+        float temp = initTemp;
         
         //tabPane.setComponentAt(1, bg.getContentPane());
         long startTime = System.currentTimeMillis();
@@ -530,7 +539,7 @@ public JPanel getPuzzleMenu(String selected) {
            //System.out.println(temp);
        }
         long endTime = System.currentTimeMillis();
-        long evaluationTime = endTime - startTime;        
+        long evaluationTime = endTime - startTime;
         tabPane.setComponentAt(1, puzzleBG.getContentPane());
         puzzleMoves = new ButtonGrid(puzzleBG.getGraph().bfs(0), n);
         tabPane.setComponentAt(2,puzzleMoves.getContentPane());
@@ -539,6 +548,47 @@ public JPanel getPuzzleMenu(String selected) {
 
 
     }
+    if(source == populationApproachGenerate)
+    {
+        int n = (int)sizeBox.getSelectedItem();
+        long iterEndTime = (int)iterEndTimeBox.getSelectedItem();
+        
+        //tabPane.setComponentAt(1, bg.getContentPane());
+        long startTime = System.currentTimeMillis();
+        long endTime;
+        long evaluationTime;
+
+        Random randy = new Random();
+        
+        int val;
+        bg = new ButtonGrid(n,n);
+        bg.evaluationFunction(bg.getGraph().bfs(0), n);
+        
+        int prevVal = bg.getEvaluationOutput();
+        
+        ButtonGrid puzzleBG = bg; 
+        //iteration loop
+        long elapsedTime = 0;
+        for (int i = 0; i < 10000000; ++i){
+          
+           //System.out.println(temp);
+          endTime = System.currentTimeMillis();
+          evaluationTime = endTime - startTime;
+          elapsedTime += evaluationTime;
+          if (elapsedTime >= iterEndTime){
+        	  break;
+          }
+       }
+         
+        tabPane.setComponentAt(1, puzzleBG.getContentPane());
+        puzzleMoves = new ButtonGrid(puzzleBG.getGraph().bfs(0), n);
+        tabPane.setComponentAt(2,puzzleMoves.getContentPane());
+        //dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
+        tabPane.setComponentAt(3,dataPane);
+
+
+    }
+
       if(source == cancel)
       {
         setVisible(false);
