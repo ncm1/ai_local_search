@@ -3,7 +3,7 @@ import java.util.Random;
 public class HillClimbing
 {
   int[][] newPuzzle;
-  int[][] currPuzzle;
+  int[][] bestPuzzle;
   int[] visited;
   int n;
   /*
@@ -14,11 +14,15 @@ public class HillClimbing
   HillClimbing(int[][] arr, int n)
   {
     this.n = n;
-    this.visited    = new int[n];
-    this.currPuzzle = new int[n][n];
-    this.newPuzzle  = new int[n][n];
-    this.currPuzzle = arr.clone();
-    this.newPuzzle  = arr.clone();
+    visited    = new int[n*n];
+    bestPuzzle = new int[n][n];
+    newPuzzle  = new int[n][n];
+    for(int i = 0; i < arr.length; i++){
+      for(int j = 0; j < arr[0].length; j++){
+        newPuzzle[i][j]  = arr[i][j];
+        bestPuzzle[i][j] = arr[i][j];
+      }
+    }
   }
 
   public void hillClimb()
@@ -35,7 +39,7 @@ public class HillClimbing
 
     //set max equal to the max legal jump of the random non goal cell
     max = getMaxLegalJump(x,y,n-1);
-    randNonGoalCellValue = currPuzzle[x][y];
+    randNonGoalCellValue = bestPuzzle[x][y];
     min = 1; // the minimum MOVE should be at least 1
     int newLegalRandomMove = randy.nextInt(max - min + 1) + min;
 
@@ -51,12 +55,16 @@ public class HillClimbing
     return newPuzzle;
   }
 
-  public void setCurrPuzzle(int[][] puzzle){
-    this.currPuzzle = puzzle;
+  public void setbestPuzzleToNew(int[][] newPuzzle){
+    for(int i = 0; i < newPuzzle.length; i++){
+      for(int j = 0; j < newPuzzle[0].length; j++){
+        bestPuzzle[i][j] = newPuzzle[i][j];
+      }
+    }
   }
 
-  public int[][] getCurrPuzzle(){
-    return currPuzzle;
+  public int[][] getbestPuzzle(){
+    return bestPuzzle;
   }
 
   public void setVisited(int[] visited){
