@@ -6,13 +6,11 @@ public class HillClimbing
   int[][] bestPuzzle;
   int[] visited;
   int n;
-  /*
-    This function takes a two dim array as input and chooses a random
-    non-goal cell and changes the number to a different, random, legal
-    move number.
-  */
-  HillClimbing(int[][] arr, int n)
-  {
+
+
+  
+  HillClimbing(int[][] arr, int n){
+    // initializes new puzzle and best puzzle with given array
     this.n = n;
     visited    = new int[n*n];
     bestPuzzle = new int[n][n];
@@ -25,13 +23,19 @@ public class HillClimbing
     }
   }
 
-  public void hillClimb()
-  {
-    Random randy = new Random();
+
+  public void hillClimb(){
+    /*
+      This function takes a two dim array as input and chooses a random
+      non-goal cell and changes the number to a different, random, legal
+      move number.
+    */
     int min = 0;          //Minimum non goal cell is the start cell
     int max = (n*n) - 2; //Maximum non goal cell is n^2 - 2, since n^2 - 1 is goal
     int randNonGoalCell;
     int randNonGoalCellValue;
+    
+    Random randy = new Random();
     randNonGoalCell = randy.nextInt(max - min + 1) + min;
 
     int x = getXCell(randNonGoalCell,n);

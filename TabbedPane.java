@@ -2,11 +2,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.lang.*;
 import java.math.*;
+import java.text.NumberFormat;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.table.*;
+import javax.swing.text.NumberFormatter;
+
 import java.io.*;
 
 public class TabbedPane extends JFrame implements ActionListener
@@ -56,6 +59,97 @@ JTextField userField;
 //Basic Hill Climbing needs a JButton for the number of iterations
 JComboBox iterBox = new JComboBox();
 JButton basicHillGenerate;
+JButton simulatedAnnealingGenerate;
+JButton populationApproachGenerate;
+
+//JTextField initTempField = new JTextField();
+//JTextField tempDecayRateField = new JTextField();
+JComboBox initTempField = new JComboBox();
+JComboBox tempDecayRateField = new JComboBox();
+
+JComboBox iterEndTimeBox = new JComboBox();
+/*
+public JPanel PopulationPuzzleMenu(){
+
+}
+*/
+
+public JPanel SimulatedAnnealingPuzzleMenu() {
+  JPanel pane = new JPanel();
+
+  setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  pane.setLayout(null);
+
+  //Setting the Title and location
+  JLabel title  = new JLabel("Simulated Annealing Puzzle Menu");
+  title.setBounds(150,50,600,100);
+  Font font = new Font("Cambria", Font.BOLD, 30);
+  title.setFont(font);
+
+  JLabel iterPrompt = new JLabel("Please select the number of iterations:");
+  JLabel initTempPrompt = new JLabel("Please select the initial temperature: ");
+  JLabel tempDecayRatePrompt = new JLabel("Please select the decay rate: ");
+  JLabel sizePrompt = new JLabel("Size:");
+  sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
+  //Populate the sizebox with the possible puzzle sizes
+  sizeBox.addItem(5);
+  sizeBox.addItem(7);
+  sizeBox.addItem(9);
+  sizeBox.addItem(11);
+
+  for(int i = 10; i <= 100000; i+= 250)
+    iterBox.addItem(i);
+
+  for (float i = 0; i <= 1000; i=i+1){
+	initTempField.addItem(i);
+    tempDecayRateField.addItem((Float) (i/1000));
+  }
+
+  //Add generate icon as a button on the gui
+  ImageIcon generate_Icon  = new ImageIcon("icons/generate.png");
+  simulatedAnnealingGenerate = new JButton(generate_Icon);
+  ImageIcon cancel_Icon = new ImageIcon("icons/back.png");
+  cancel = new JButton(cancel_Icon);
+
+  simulatedAnnealingGenerate.setBounds(600,480,150,44);
+  cancel.setBounds(100,480,120,44);
+  sizePrompt.setBounds(120, 40, 200, 200);
+  sizeBox.setBounds(120, 150, 200, 100);
+  iterPrompt.setBounds(120, 190, 250,200);
+  iterBox.setBounds(120, 300, 200, 100);
+  initTempPrompt.setBounds(450,40,250,200);
+  initTempField.setBounds(450,150,200,100);
+  tempDecayRatePrompt.setBounds(450,190,250,200);
+  tempDecayRateField.setBounds(450,300,200,100);
+
+  simulatedAnnealingGenerate.addActionListener(this);
+  cancel.addActionListener(this);
+  sizeBox.addActionListener(this);
+  iterBox.addActionListener(this);
+  initTempField.addActionListener(this);
+  tempDecayRateField.addActionListener(this);
+  //System.out.println("I'm here at least");
+
+  //Add the title, prompt, sizebox, and generate icon to the interface
+  pane.add(title);
+  pane.add(sizePrompt);
+  pane.add(sizeBox);
+  pane.add(iterBox);
+  pane.add(iterPrompt);
+  pane.add(iterBox);
+  pane.add(initTempPrompt);
+  pane.add(initTempField);
+  pane.add(tempDecayRatePrompt);
+  pane.add(tempDecayRateField);
+  pane.add(simulatedAnnealingGenerate);
+  pane.add(cancel);
+
+  getContentPane().add(pane);
+  setSize(800,600);
+  setVisible(true);
+
+  return pane;
+}
 
 public JPanel BasicPuzzleMenu() {
   JPanel pane = new JPanel();
@@ -89,7 +183,7 @@ public JPanel BasicPuzzleMenu() {
 
   basicGenerate.setBounds(520,400,150,44);
   cancel.setBounds(150,395,150,44);
-  sizeBox.setBounds(190, 95, 350, 200);
+  sizeBox.setBounds(190, 95, 150, 200);
   basicGenerate.addActionListener(this);
   cancel.addActionListener(this);
 
@@ -207,8 +301,7 @@ public JPanel BasicHillClimbingPuzzleMenu() {
   return pane;
 }
 
-public JPanel getPuzzleMenu(String selected)
-{
+public JPanel getPuzzleMenu(String selected) {
   JPanel puzzleMenuPanel = new JPanel();
   //Basic Puzzle Evaluation is for generating random puzzles, generally
   //puzzles are not very "difficult"
@@ -222,7 +315,7 @@ public JPanel getPuzzleMenu(String selected)
     puzzleMenuPanel = UserPuzzleMenu();
     return puzzleMenuPanel;
   }
-  //TODO: IMPLEMENT!
+  
   else if(selected == "Basic Hill Climbing"){
     puzzleMenuPanel = BasicHillClimbingPuzzleMenu();
     return puzzleMenuPanel;
@@ -238,21 +331,20 @@ public JPanel getPuzzleMenu(String selected)
     //return puzzleMenuPanel;
   }
 
-  //TODO: IMPLEMENT!
   else if(selected == "Simulated Annealing"){
-    //puzzleMenuPanel = BasicPuzzleMenu();
-    //return puzzleMenuPanel;
+    puzzleMenuPanel = SimulatedAnnealingPuzzleMenu();
+    return puzzleMenuPanel;
   }
   //TODO: IMPLEMENT!
   else if(selected == "Population Based Approach"){
-    //puzzleMenuPanel = BasicPuzzleMenu();
+    //puzzleMenuPanel = PopulationPuzzleMenu();
     //return puzzleMenuPanel;
   }
   return puzzleMenuPanel;
 }
 
 public void basicApproach(){
-	int n = (int)sizeBox.getSelectedItem();
+	  int n = (int)sizeBox.getSelectedItem();
 
     bg = new ButtonGrid(n,n);
     tabPane.setComponentAt(1, bg.getContentPane());
@@ -296,39 +388,30 @@ public void userGeneratedApproach(){
 }
 
 
-public void basicHillGenerate(){
-
-    /*PrintWriter maxEvalFile = null;
+public void basicHillApproach(){
+  /*
+    PrintWriter maxEvalFile = null;
     try{
       maxEvalFile = new PrintWriter(new FileWriter("./basicHillClimbingPuzzles/maxEval.txt", true));
     }catch (IOException i) {
     // TODO Auto-generated catch block
     i.printStackTrace();
   }*/
-
     long startTime = System.currentTimeMillis();
 
     int n    = (int)sizeBox.getSelectedItem();
     int iter = (int)iterBox.getSelectedItem();
 
-    bg = new ButtonGrid(n,n);
-    //tabPane.setComponentAt(1, bg.getContentPane());
-    //Getting the corresponding graph to create movesPane
-    Graph g = bg.getGraph();
     int sqr = n*n;
     int[] visited = new int[sqr];
     int[][] currBestPuzzle = new int[n][n];
     int[][] tempPuzzle     = new int[n][n];
+    bg = new ButtonGrid(n,n);
     currBestPuzzle = bg.getPuzzleArr();
-
+    Graph g = bg.getGraph();
     visited = g.bfs(0);
-    //Call ButtonGrid constructor to create the puzzle moves pane
-    puzzleMoves = new ButtonGrid(visited, n);
-    //tabPane.setComponentAt(2,puzzleMoves.getContentPane());
 
-    //dataPane = new DataPane(puzzleMoves.getEvaluationOutput());
-    //tabPane.setComponentAt(3,dataPane);
-
+    puzzleMoves = new ButtonGrid(visited, n); //Call ButtonGrid constructor to create the puzzle moves pane
     //get the evalOutput for the first puzzle
     int maxEvalOutput = puzzleMoves.getEvaluationOutput();
     //create a currEvalOutput variable to compare to the maxEvalOutput
@@ -393,6 +476,96 @@ public void basicHillGenerate(){
 
 }
 
+public void simulatedAnnealingApproach(){
+        int n = (int)sizeBox.getSelectedItem();
+        int iter = (int)iterBox.getSelectedItem();
+        float initTemp = (Float) initTempField.getSelectedItem();
+        float decayRate = (Float) tempDecayRateField.getSelectedItem();
+        float temp = initTemp;
+        
+        //tabPane.setComponentAt(1, bg.getContentPane());
+        long startTime = System.currentTimeMillis();
+
+        Random randy = new Random();
+        
+        int val;
+        Puzzle puz = new Puzzle(n,n);
+        puz.evaluationFunction(puz.getGraph().bfs(0), n);
+        
+        int prevVal = puz.getEvaluationOutput();
+        
+        Puzzle puzzleBG = puz; 
+        //iteration loop
+        for (int i = 0; i < iter; ++i){
+          temp = temp * decayRate;
+          puz = new Puzzle(n,n);
+          puz.evaluationFunction(puz.getGraph().bfs(0), n);
+          val = puz.getEvaluationOutput(); // val is evaluation value
+          if ( val > prevVal){ // if evaluation value of current puzzle config is greater than ev. value of previous puzzle config
+           prevVal = val;
+           puzzleBG = puz;
+          }
+          else if ( val <= prevVal){ // if evaluation value of current puzzle config is lte than ev. value of previous puzzle config
+            if (randy.nextFloat() < Math.exp((double)(val - prevVal )/temp)){ //  probability condition met
+              prevVal = val;
+              puzzleBG = puz;
+            }
+            else {// probability failed // taking higher value
+              prevVal = prevVal;
+            }
+          }
+          temp = temp*decayRate; //apply decay to temp
+          //System.out.println(temp);
+       }
+        long endTime = System.currentTimeMillis();
+        long evaluationTime = endTime - startTime;
+        bg = new ButtonGrid(puzzleBG.puzzleArr,puzzleBG.n);
+        tabPane.setComponentAt(1, bg.getContentPane());
+        puzzleMoves = new ButtonGrid(puzzleBG.getGraph().bfs(0), n);
+        tabPane.setComponentAt(2,puzzleMoves.getContentPane());
+        dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
+        tabPane.setComponentAt(3,dataPane);
+}
+
+public void populationApproach(){
+  int n = (int)sizeBox.getSelectedItem();
+        long iterEndTime = (int)iterEndTimeBox.getSelectedItem();
+        
+        //tabPane.setComponentAt(1, bg.getContentPane());
+        long startTime = System.currentTimeMillis();
+        long endTime;
+        long evaluationTime;
+
+        Random randy = new Random();
+        
+        int val;
+        bg = new ButtonGrid(n,n);
+        bg.evaluationFunction(bg.getGraph().bfs(0), n);
+        
+        int prevVal = bg.getEvaluationOutput();
+        
+        ButtonGrid puzzleBG = bg; 
+        //iteration loop
+        long elapsedTime = 0;
+        for (int i = 0; i < 10000000; ++i){
+          
+           //System.out.println(temp);
+          endTime = System.currentTimeMillis();
+          evaluationTime = endTime - startTime;
+          elapsedTime += evaluationTime;
+          if (elapsedTime >= iterEndTime){
+            break;
+          }
+       }
+         
+        tabPane.setComponentAt(1, puzzleBG.getContentPane());
+        puzzleMoves = new ButtonGrid(puzzleBG.getGraph().bfs(0), n);
+        tabPane.setComponentAt(2,puzzleMoves.getContentPane());
+        //dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
+        tabPane.setComponentAt(3,dataPane);
+
+
+}
 
 /*
 *       OVERRIDING THE ACTION LISTENER
@@ -411,15 +584,19 @@ public void basicHillGenerate(){
       userGeneratedApproach();
     }
     if(source == basicHillGenerate){ //Handles the Basic Hill Climbing evaluation methods
-    	basicHillGenerate();
+    	basicHillApproach();
     }
-
-    if(source == cancel)
-    {
-    	setVisible(false);
-    	MainMenu mainMenu = new MainMenu();
+    if(source == simulatedAnnealingGenerate){
+      simulatedAnnealingApproach();    
     }
-
+    if(source == populationApproachGenerate){
+      populationApproach();   
+    }
+    if(source == cancel){
+        setVisible(false);
+        MainMenu mainMenu = new MainMenu();
+    }
 
   }//end action listener here
+
 }
