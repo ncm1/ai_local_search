@@ -10,8 +10,6 @@ import javax.swing.table.*;
 import java.io.*;
 
 public class TabbedPane extends JFrame implements ActionListener
-
-
 {
   //Create main tabePane object where each of the tabs will be placed
   JTabbedPane tabPane;
@@ -253,6 +251,148 @@ public JPanel getPuzzleMenu(String selected)
   return puzzleMenuPanel;
 }
 
+public void basicApproach(){
+	int n = (int)sizeBox.getSelectedItem();
+
+    bg = new ButtonGrid(n,n);
+    tabPane.setComponentAt(1, bg.getContentPane());
+    //Getting the corresponding graph to create movesPane
+    Graph g = bg.getGraph();
+    int sqr = n*n;
+    int[] visited = new int[sqr];
+    visited = g.bfs(0);
+    //Call ButtonGrid constructor to create the puzzle moves pane
+    puzzleMoves = new ButtonGrid(visited, n);
+    tabPane.setComponentAt(2,puzzleMoves.getContentPane());
+
+    dataPane = new DataPane(puzzleMoves.getEvaluationOutput());
+    tabPane.setComponentAt(3,dataPane);
+}
+
+public void userGeneratedApproach(){
+	String fileName = (String)userField.getText();
+    if(fileName != null)
+    {
+      //System.out.println(fileName);
+      FileToMatrix ftm = new FileToMatrix(fileName);
+      //Get the length of the puzzle
+      int puzzleArrLen = ftm.getPuzzleArr().length;
+      bg = new ButtonGrid(ftm.getPuzzleArr());
+      tabPane.setComponentAt(1, bg.getContentPane());
+
+      //Getting the corresponding graph to create movesPane
+      Graph g = bg.getGraph();
+      int[] visited = new int[puzzleArrLen];
+      visited = g.bfs(0);
+
+      int sqrRoot = (int)Math.sqrt(puzzleArrLen);
+      //Call ButtonGrid constructor to create the puzzle moves pane
+      puzzleMoves = new ButtonGrid(visited, sqrRoot);
+      tabPane.setComponentAt(2,puzzleMoves.getContentPane());
+
+      dataPane = new DataPane(puzzleMoves.getEvaluationOutput());
+      tabPane.setComponentAt(3,dataPane);
+    }
+}
+
+
+public void basicHillGenerate(){
+
+    /*PrintWriter maxEvalFile = null;
+    try{
+      maxEvalFile = new PrintWriter(new FileWriter("./basicHillClimbingPuzzles/maxEval.txt", true));
+    }catch (IOException i) {
+    // TODO Auto-generated catch block
+    i.printStackTrace();
+  }*/
+
+    long startTime = System.currentTimeMillis();
+
+    int n    = (int)sizeBox.getSelectedItem();
+    int iter = (int)iterBox.getSelectedItem();
+
+    bg = new ButtonGrid(n,n);
+    //tabPane.setComponentAt(1, bg.getContentPane());
+    //Getting the corresponding graph to create movesPane
+    Graph g = bg.getGraph();
+    int sqr = n*n;
+    int[] visited = new int[sqr];
+    int[][] currBestPuzzle = new int[n][n];
+    int[][] tempPuzzle     = new int[n][n];
+    currBestPuzzle = bg.getPuzzleArr();
+
+    visited = g.bfs(0);
+    //Call ButtonGrid constructor to create the puzzle moves pane
+    puzzleMoves = new ButtonGrid(visited, n);
+    //tabPane.setComponentAt(2,puzzleMoves.getContentPane());
+
+    //dataPane = new DataPane(puzzleMoves.getEvaluationOutput());
+    //tabPane.setComponentAt(3,dataPane);
+
+    //get the evalOutput for the first puzzle
+    int maxEvalOutput = puzzleMoves.getEvaluationOutput();
+    //create a currEvalOutput variable to compare to the maxEvalOutput
+    int currEvalOutput = 0;
+
+    HillClimbing hClimb = new HillClimbing(currBestPuzzle, n);
+    hClimb.setVisited(visited);
+
+    for(int iterations = 0; iterations < iter; iterations++)
+    {
+      //Method hillClimb chooses a random non goal cell and then replaces
+      //it with a new legal random move
+      hClimb.hillClimb();
+      //Generate the new directed graph and perform bfs
+      bg.generateDigraph(hClimb.getNewPuzzle(), n);
+      g = bg.getGraph();
+      //set visited to the set of puzzle moves and finally compare
+      //the evaluation output
+      visited = g.bfs(0);
+      //We need to get the new evaluation function output now, we can use
+      //the method avaliable in the ButtonGrid class
+      bg.evaluationFunction(visited,n);
+      currEvalOutput = bg.getEvaluationOutput();
+
+      /*
+          FOR DEBUGGING CAN BE REMOVED TO IMPROVE PERFORMANCE
+      */
+
+      //System.out.println("maxEvalOutput: " + maxEvalOutput);
+      bg.printArr(hClimb.getbestPuzzle());
+
+      //System.out.println("currEvalOutput: " + currEvalOutput);
+      bg.printArr(hClimb.getNewPuzzle());
+      //System.out.println("Curr")
+
+      if(currEvalOutput >= maxEvalOutput)
+      {
+        //Set the new evaluation output
+        maxEvalOutput = currEvalOutput;
+        hClimb.setbestPuzzleToNew(hClimb.getNewPuzzle());
+        currBestPuzzle = hClimb.getNewPuzzle();
+        hClimb.setVisited(visited);
+        //bestPuzzleFile.createNewFile();
+      }
+      //maxEvalFile.println(maxEvalOutput);
+    }//end for loop
+
+    //Calculate the end time and the total time by subtracting end from start
+    long endTime = System.currentTimeMillis();
+    long evaluationTime = endTime - startTime;
+
+    bg = new ButtonGrid(hClimb.getbestPuzzle(), n);
+    tabPane.setComponentAt(1, bg.getContentPane());
+
+    visited = hClimb.getVisited();
+    puzzleMoves = new ButtonGrid(visited,n);
+    tabPane.setComponentAt(2,puzzleMoves.getContentPane());
+
+    dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
+    tabPane.setComponentAt(3,dataPane);
+    //maxEvalFile.close();
+
+}
+
 
 /*
 *       OVERRIDING THE ACTION LISTENER
@@ -264,157 +404,21 @@ public JPanel getPuzzleMenu(String selected)
   {
     Object source = e.getSource();
 
-    if(source == basicGenerate)
+    if(source == basicGenerate){
+        basicApproach();
+    }
+    if(source == userConfirm){
+      userGeneratedApproach();
+    }
+    if(source == basicHillGenerate){ //Handles the Basic Hill Climbing evaluation methods
+    	basicHillGenerate();
+    }
+
+    if(source == cancel)
     {
-        int n = (int)sizeBox.getSelectedItem();
-
-        bg = new ButtonGrid(n,n);
-        tabPane.setComponentAt(1, bg.getContentPane());
-        //Getting the corresponding graph to create movesPane
-        Graph g = bg.getGraph();
-        int sqr = n*n;
-        int[] visited = new int[sqr];
-        visited = g.bfs(0);
-        //Call ButtonGrid constructor to create the puzzle moves pane
-        puzzleMoves = new ButtonGrid(visited, n);
-        tabPane.setComponentAt(2,puzzleMoves.getContentPane());
-
-        dataPane = new DataPane(puzzleMoves.getEvaluationOutput());
-        tabPane.setComponentAt(3,dataPane);
-    }//end basic user generated action listener
-
-
-    if(source == userConfirm)
-    {
-      String fileName = (String)userField.getText();
-      if(fileName != null)
-      {
-        System.out.println(fileName);
-        FileToMatrix ftm = new FileToMatrix(fileName);
-        //Get the length of the puzzle
-        int puzzleArrLen = ftm.getPuzzleArr().length;
-        bg = new ButtonGrid(ftm.getPuzzleArr());
-        tabPane.setComponentAt(1, bg.getContentPane());
-
-        //Getting the corresponding graph to create movesPane
-        Graph g = bg.getGraph();
-        int[] visited = new int[puzzleArrLen];
-        visited = g.bfs(0);
-
-        int sqrRoot = (int)Math.sqrt(puzzleArrLen);
-        //Call ButtonGrid constructor to create the puzzle moves pane
-        puzzleMoves = new ButtonGrid(visited, sqrRoot);
-        tabPane.setComponentAt(2,puzzleMoves.getContentPane());
-
-        dataPane = new DataPane(puzzleMoves.getEvaluationOutput());
-        tabPane.setComponentAt(3,dataPane);
-      }
-    }//end user generated puzzle action listener
-
-      //Handles the Basic Hill Climbing evaluation methods
-    if(source == basicHillGenerate)
-    {
-
-        /*PrintWriter maxEvalFile = null;
-        try{
-          maxEvalFile = new PrintWriter(new FileWriter("./basicHillClimbingPuzzles/maxEval.txt", true));
-        }catch (IOException i) {
-        // TODO Auto-generated catch block
-        i.printStackTrace();
-      }*/
-
-        long startTime = System.currentTimeMillis();
-
-        int n    = (int)sizeBox.getSelectedItem();
-        int iter = (int)iterBox.getSelectedItem();
-
-        bg = new ButtonGrid(n,n);
-        //tabPane.setComponentAt(1, bg.getContentPane());
-        //Getting the corresponding graph to create movesPane
-        Graph g = bg.getGraph();
-        int sqr = n*n;
-        int[] visited = new int[sqr];
-        int[][] currBestPuzzle = new int[n][n];
-        int[][] tempPuzzle     = new int[n][n];
-        currBestPuzzle = bg.getPuzzleArr();
-
-        visited = g.bfs(0);
-        //Call ButtonGrid constructor to create the puzzle moves pane
-        puzzleMoves = new ButtonGrid(visited, n);
-        //tabPane.setComponentAt(2,puzzleMoves.getContentPane());
-
-        //dataPane = new DataPane(puzzleMoves.getEvaluationOutput());
-        //tabPane.setComponentAt(3,dataPane);
-
-        //get the evalOutput for the first puzzle
-        int maxEvalOutput = puzzleMoves.getEvaluationOutput();
-        //create a currEvalOutput variable to compare to the maxEvalOutput
-        int currEvalOutput = 0;
-
-        HillClimbing hClimb = new HillClimbing(currBestPuzzle, n);
-        hClimb.setVisited(visited);
-
-        for(int iterations = 0; iterations < iter; iterations++)
-        {
-          //Method hillClimb chooses a random non goal cell and then replaces
-          //it with a new legal random move
-          hClimb.hillClimb();
-          //Generate the new directed graph and perform bfs
-          bg.generateDigraph(hClimb.getNewPuzzle(), n);
-          g = bg.getGraph();
-          //set visited to the set of puzzle moves and finally compare
-          //the evaluation output
-          visited = g.bfs(0);
-          //We need to get the new evaluation function output now, we can use
-          //the method avaliable in the ButtonGrid class
-          bg.evaluationFunction(visited,n);
-          currEvalOutput = bg.getEvaluationOutput();
-
-          /*
-              FOR DEBUGGING CAN BE REMOVED TO IMPROVE PERFORMANCE
-          */
-
-          System.out.println("maxEvalOutput: " + maxEvalOutput);
-          bg.printArr(hClimb.getbestPuzzle());
-
-          System.out.println("currEvalOutput: " + currEvalOutput);
-          bg.printArr(hClimb.getNewPuzzle());
-          //System.out.println("Curr")
-
-          if(currEvalOutput >= maxEvalOutput)
-          {
-            //Set the new evaluation output
-            maxEvalOutput = currEvalOutput;
-            hClimb.setbestPuzzleToNew(hClimb.getNewPuzzle());
-            currBestPuzzle = hClimb.getNewPuzzle();
-            hClimb.setVisited(visited);
-            //bestPuzzleFile.createNewFile();
-          }
-          //maxEvalFile.println(maxEvalOutput);
-        }//end for loop
-
-        //Calculate the end time and the total time by subtracting end from start
-        long endTime = System.currentTimeMillis();
-        long evaluationTime = endTime - startTime;
-
-        bg = new ButtonGrid(hClimb.getbestPuzzle(), n);
-        tabPane.setComponentAt(1, bg.getContentPane());
-
-        visited = hClimb.getVisited();
-        puzzleMoves = new ButtonGrid(visited,n);
-        tabPane.setComponentAt(2,puzzleMoves.getContentPane());
-
-        dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
-        tabPane.setComponentAt(3,dataPane);
-        //maxEvalFile.close();
-
-      }//end basic Hill Climbing action listener
-
-      if(source == cancel)
-      {
-        setVisible(false);
-        MainMenu mainMenu = new MainMenu();
-      }
+    	setVisible(false);
+    	MainMenu mainMenu = new MainMenu();
+    }
 
 
   }//end action listener here
