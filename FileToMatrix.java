@@ -23,9 +23,13 @@ public class FileToMatrix{
             {
                 //Split the line of values into seperate strings of ints
                 String[] values = line.split(" ");
+
+                if(values.length >= 5)
+                {
                 //For loop for parsing each of the strings to Integers
                 for(int i =0; i < values.length; i++)
                   puzzle.add(Integer.parseInt(values[i]));
+                }//accounting for both file formats
             }
 
             // convert it to array of Integer since we can't have ArrayList<int> :(
