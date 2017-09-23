@@ -59,6 +59,9 @@ JTextField userField;
 //Basic Hill Climbing needs a JButton for the number of iterations
 JComboBox iterBox = new JComboBox();
 JButton basicHillGenerate;
+//Hill Climbing with random restarts needs number of restarts
+JComboBox restartBox = new JComboBox();
+JButton hillClimbRestartsGenerate;
 JButton simulatedAnnealingGenerate;
 JButton populationApproachGenerate;
 
@@ -73,7 +76,6 @@ public JPanel PopulationPuzzleMenu(){
 
 }
 */
-
 public JPanel SimulatedAnnealingPuzzleMenu() {
   JPanel pane = new JPanel();
 
@@ -263,7 +265,7 @@ public JPanel BasicHillClimbingPuzzleMenu() {
   sizeBox.addItem(9);
   sizeBox.addItem(11);
 
-  for(int i = 10; i <= 100000; i+= 250)
+  for(int i = 1000; i <= 100000; i+= 250)
     iterBox.addItem(i);
 
   //Add generate icon as a button on the gui
@@ -301,6 +303,78 @@ public JPanel BasicHillClimbingPuzzleMenu() {
   return pane;
 }
 
+public JPanel HillClimbingRandomRestartsMenu(){
+  JPanel pane = new JPanel();
+
+  setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  pane.setLayout(null);
+
+  //Setting the Title and location
+  JLabel title  = new JLabel("Hill Climbing with Random Restarts Main Menu");
+  title.setBounds(75,10,700,100);
+  Font font = new Font("Cambria", Font.BOLD, 25);
+  title.setFont(font);
+
+  JLabel sizePrompt = new JLabel("Please select a size n");
+  JLabel iterPrompt = new JLabel("Please select the number of iterations per process:");
+  JLabel restartPrompt = new JLabel("Please select the number of restarts");
+
+  //Setting the default text to display
+  sizeBox.setPrototypeDisplayValue("Size");
+  //Populate the sizebox with the possible puzzle sizes
+  sizeBox.addItem(5);
+  sizeBox.addItem(7);
+  sizeBox.addItem(9);
+  sizeBox.addItem(11);
+
+  for(int i = 100; i <= 100000; i+= 100)
+    iterBox.addItem(i);
+  for(int j = 10; j <= 1000; j+= 10)
+    restartBox.addItem(j);
+
+  //Add generate icon as a button on the gui
+  ImageIcon generate_Icon  = new ImageIcon("icons/generate.png");
+  hillClimbRestartsGenerate = new JButton(generate_Icon);
+  ImageIcon cancel_Icon = new ImageIcon("icons/back.png");
+  cancel = new JButton(cancel_Icon);
+
+  hillClimbRestartsGenerate.setBounds(520,400,150,44);
+  cancel.setBounds(150,390,150,44);
+
+  sizePrompt.setBounds(300, 20, 200, 200);
+  sizeBox.setBounds(270, 100, 200, 100);
+
+  iterPrompt.setBounds(260, 105, 250,200);
+  iterBox.setBounds(280, 195, 200, 100);
+
+  restartPrompt.setBounds(260, 195, 250, 200);
+  restartBox.setBounds(280,295, 200, 100);
+
+  hillClimbRestartsGenerate.addActionListener(this);
+  cancel.addActionListener(this);
+  sizeBox.addActionListener(this);
+  iterBox.addActionListener(this);
+  restartBox.addActionListener(this);
+  //System.out.println("I'm here at least");
+
+  //Add the title, prompt, sizebox, and generate icon to the interface
+  pane.add(title);
+  pane.add(sizePrompt);
+  pane.add(sizeBox);
+  pane.add(iterBox);
+  pane.add(restartBox);
+  pane.add(iterPrompt);
+  pane.add(restartPrompt);
+  pane.add(hillClimbRestartsGenerate);
+  pane.add(cancel);
+
+  getContentPane().add(pane);
+  setSize(800,600);
+  setVisible(true);
+
+  return pane;
+}
+
 public JPanel getPuzzleMenu(String selected) {
   JPanel puzzleMenuPanel = new JPanel();
   //Basic Puzzle Evaluation is for generating random puzzles, generally
@@ -315,15 +389,15 @@ public JPanel getPuzzleMenu(String selected) {
     puzzleMenuPanel = UserPuzzleMenu();
     return puzzleMenuPanel;
   }
-  
+
   else if(selected == "Basic Hill Climbing"){
     puzzleMenuPanel = BasicHillClimbingPuzzleMenu();
     return puzzleMenuPanel;
   }
   //TODO: IMPLEMENT!
   else if(selected == "Hill Climbing with Random Restarts"){
-    //puzzleMenuPanel = BasicPuzzleMenu();
-    //return puzzleMenuPanel;
+    puzzleMenuPanel = HillClimbingRandomRestartsMenu();
+    return puzzleMenuPanel;
   }
   //TODO: IMPLEMENT!
   else if(selected == "Hill Climbing with Random Walk"){
@@ -387,7 +461,6 @@ public void userGeneratedApproach(){
     }
 }
 
-
 public void basicHillApproach(){
   /*
     PrintWriter maxEvalFile = null;
@@ -441,10 +514,9 @@ public void basicHillApproach(){
       */
 
       //System.out.println("maxEvalOutput: " + maxEvalOutput);
-      bg.printArr(hClimb.getbestPuzzle());
-
+      //bg.printArr(hClimb.getbestPuzzle());
       //System.out.println("currEvalOutput: " + currEvalOutput);
-      bg.printArr(hClimb.getNewPuzzle());
+      //bg.printArr(hClimb.getNewPuzzle());
       //System.out.println("Curr")
 
       if(currEvalOutput >= maxEvalOutput)
@@ -452,7 +524,6 @@ public void basicHillApproach(){
         //Set the new evaluation output
         maxEvalOutput = currEvalOutput;
         hClimb.setbestPuzzleToNew(hClimb.getNewPuzzle());
-        currBestPuzzle = hClimb.getNewPuzzle();
         hClimb.setVisited(visited);
         //bestPuzzleFile.createNewFile();
       }
@@ -476,25 +547,110 @@ public void basicHillApproach(){
 
 }
 
+public void hillClimbingRandomRestartApproach(){
+
+  /*PrintWriter maxEvalFile = null;
+    try{
+      maxEvalFile = new PrintWriter(new FileWriter("./basicHillClimbingPuzzles/maxEval.txt", true));
+    }catch (IOException i) {
+    // TODO Auto-generated catch block
+    i.printStackTrace();
+  }*/
+
+  long startTime = System.currentTimeMillis();
+
+  int n    = (int)sizeBox.getSelectedItem();
+  int iter = (int)iterBox.getSelectedItem();
+  int restarts = (int)restartBox.getSelectedItem();
+  int currEvalOutput;
+  int maxEvalOutput;
+
+  //Create a random new puzzle to begin with
+  bg = new ButtonGrid(n,n);
+  //Getting the corresponding graph to get the moves array
+  Graph g = bg.getGraph();
+  //visited array will represent the moves array
+  int[] visited = new int[n*n];
+  visited = g.bfs(0);
+  //set visited to the set of puzzle moves and finally compare
+  //the evaluation output
+  //Call ButtonGrid constructor to create the puzzle moves pane
+  puzzleMoves = new ButtonGrid(visited, n);
+  //get the evalOutput for the first puzzle
+  maxEvalOutput = puzzleMoves.getEvaluationOutput();
+  bg.evaluationFunction(visited,n);
+  //get the evalOutput for the first puzzle and set as max
+  maxEvalOutput = puzzleMoves.getEvaluationOutput();
+
+  HillClimbing hClimb = new HillClimbing(bg.getPuzzleArr(), n);
+  hClimb.setVisited(visited);
+
+  for(int i = 0; i < restarts; i++)
+  {
+    for(int j = 0; j < iter; j++)
+    {
+      hClimb.hillClimb();
+      //Generate the new directed graph and perform bfs
+      bg.generateDigraph(hClimb.getNewPuzzle(), n);
+      g = bg.getGraph();
+      //set visited to the set of puzzle moves and finally compare
+      //the evaluation output
+      visited = g.bfs(0);
+      //We need to get the new evaluation function output now, we can use
+      //the method avaliable in the ButtonGrid class
+      bg.evaluationFunction(visited,n);
+      currEvalOutput = bg.getEvaluationOutput();
+
+      if(currEvalOutput >= maxEvalOutput)
+      {
+        //Set the new evaluation output
+        maxEvalOutput = currEvalOutput;
+        hClimb.setbestPuzzleToNew(hClimb.getNewPuzzle());
+        hClimb.setVisited(visited);
+        //System.out.println(maxEvalOutput);
+      }
+      //maxEvalFile.println(maxEvalOutput);
+    }//end iteration loop
+    hClimb.randomResetNewPuzzle();
+    //System.out.println("Random reset puzzle: ");
+    //bg.printArr(hClimb.getNewPuzzle());
+    //maxEvalOutput = bg.getEvaluationOutput()
+  }//end restart loop per hill climbing process
+  //Calculate the end time and the total time by subtracting end from start
+  long endTime = System.currentTimeMillis();
+  long evaluationTime = endTime - startTime;
+
+  bg = new ButtonGrid(hClimb.getbestPuzzle(), n);
+  tabPane.setComponentAt(1, bg.getContentPane());
+
+  visited = hClimb.getVisited();
+  puzzleMoves = new ButtonGrid(visited,n);
+  tabPane.setComponentAt(2,puzzleMoves.getContentPane());
+
+  dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
+  tabPane.setComponentAt(3,dataPane);
+  //maxEvalFile.close();
+}
+
 public void simulatedAnnealingApproach(){
         int n = (int)sizeBox.getSelectedItem();
         int iter = (int)iterBox.getSelectedItem();
         float initTemp = (Float) initTempField.getSelectedItem();
         float decayRate = (Float) tempDecayRateField.getSelectedItem();
         float temp = initTemp;
-        
+
         //tabPane.setComponentAt(1, bg.getContentPane());
         long startTime = System.currentTimeMillis();
 
         Random randy = new Random();
-        
+
         int val;
         Puzzle puz = new Puzzle(n,n);
         puz.evaluationFunction(puz.getGraph().bfs(0), n);
-        
+
         int prevVal = puz.getEvaluationOutput();
-        
-        Puzzle puzzleBG = puz; 
+
+        Puzzle puzzleBG = puz;
         //iteration loop
         for (int i = 0; i < iter; ++i){
           temp = temp * decayRate;
@@ -530,25 +686,25 @@ public void simulatedAnnealingApproach(){
 public void populationApproach(){
   int n = (int)sizeBox.getSelectedItem();
         long iterEndTime = (int)iterEndTimeBox.getSelectedItem();
-        
+
         //tabPane.setComponentAt(1, bg.getContentPane());
         long startTime = System.currentTimeMillis();
         long endTime;
         long evaluationTime;
 
         Random randy = new Random();
-        
+
         int val;
         bg = new ButtonGrid(n,n);
         bg.evaluationFunction(bg.getGraph().bfs(0), n);
-        
+
         int prevVal = bg.getEvaluationOutput();
-        
-        ButtonGrid puzzleBG = bg; 
+
+        ButtonGrid puzzleBG = bg;
         //iteration loop
         long elapsedTime = 0;
         for (int i = 0; i < 10000000; ++i){
-          
+
            //System.out.println(temp);
           endTime = System.currentTimeMillis();
           evaluationTime = endTime - startTime;
@@ -557,7 +713,7 @@ public void populationApproach(){
             break;
           }
        }
-         
+
         tabPane.setComponentAt(1, puzzleBG.getContentPane());
         puzzleMoves = new ButtonGrid(puzzleBG.getGraph().bfs(0), n);
         tabPane.setComponentAt(2,puzzleMoves.getContentPane());
@@ -586,11 +742,14 @@ public void populationApproach(){
     if(source == basicHillGenerate){ //Handles the Basic Hill Climbing evaluation methods
     	basicHillApproach();
     }
+    if(source == hillClimbRestartsGenerate){
+      hillClimbingRandomRestartApproach();
+    }
     if(source == simulatedAnnealingGenerate){
-      simulatedAnnealingApproach();    
+      simulatedAnnealingApproach();
     }
     if(source == populationApproachGenerate){
-      populationApproach();   
+      populationApproach();
     }
     if(source == cancel){
         setVisible(false);

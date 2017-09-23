@@ -8,7 +8,7 @@ public class HillClimbing
   int n;
 
 
-  
+
   HillClimbing(int[][] arr, int n){
     // initializes new puzzle and best puzzle with given array
     this.n = n;
@@ -34,7 +34,7 @@ public class HillClimbing
     int max = (n*n) - 2; //Maximum non goal cell is n^2 - 2, since n^2 - 1 is goal
     int randNonGoalCell;
     int randNonGoalCellValue;
-    
+
     Random randy = new Random();
     randNonGoalCell = randy.nextInt(max - min + 1) + min;
 
@@ -55,6 +55,38 @@ public class HillClimbing
     newPuzzle[x][y] = newLegalRandomMove; //set the new random legal move
   }
 
+  public void randomResetNewPuzzle()
+  {
+    int length = n;
+    int width  = n;
+    int tempMax;
+    int holder;
+    int min = 1;
+    int max = n - 1;
+
+    Random randy = new Random();
+
+    for(int x = 0; x < length; x++)
+    {
+        for(int y = 0; y < width; y++)
+        {
+            //Find the max legal jump
+            tempMax = getMaxLegalJump(x, y, max);
+            //get a random move that is valid in at least one direction
+            holder = randy.nextInt(tempMax - min + 1) + min;
+            //Check for the "Goal" condition
+            if(x == width - 1 && y == length - 1)
+            {
+              newPuzzle[x][y] = 0;
+            }
+            //Else add the random number to the grid
+            else
+            {
+              newPuzzle[x][y] = holder;
+            }
+        }//end inner for loop
+      }//end outer for loop
+  }
   public int[][] getNewPuzzle(){
     return newPuzzle;
   }
