@@ -4,6 +4,7 @@ public class HillClimbing
 {
   int[][] newPuzzle;
   int[][] currPuzzle;
+  int[] visited;
   int n;
   /*
     This function takes a two dim array as input and chooses a random
@@ -13,6 +14,7 @@ public class HillClimbing
   HillClimbing(int[][] arr, int n)
   {
     this.n = n;
+    this.visited    = new int[n];
     this.currPuzzle = new int[n][n];
     this.newPuzzle  = new int[n][n];
     this.currPuzzle = arr.clone();
@@ -47,6 +49,22 @@ public class HillClimbing
 
   public int[][] getNewPuzzle(){
     return newPuzzle;
+  }
+
+  public void setCurrPuzzle(int[][] puzzle){
+    this.currPuzzle = puzzle;
+  }
+
+  public int[][] getCurrPuzzle(){
+    return currPuzzle;
+  }
+
+  public void setVisited(int[] visited){
+    this.visited = visited;
+  }
+
+  public int[] getVisited(){
+    return visited;
   }
 
   //For finding the max of {rmax - r, r - rmin, cmax - c, c - cmin}

@@ -314,9 +314,10 @@ public JPanel getPuzzleMenu(String selected)
       //Handles the Basic Hill Climbing evaluation methods
     if(source == basicHillGenerate)
     {
+
         PrintWriter maxEvalFile = null;
         try{
-          maxEvalFile = new PrintWriter(new FileWriter("./basicHillClimbingPuzzles/maxEval.txt"));
+          maxEvalFile = new PrintWriter(new FileWriter("./basicHillClimbingPuzzles/maxEval.txt", true));
         }catch (IOException i) {
         // TODO Auto-generated catch block
         i.printStackTrace();
@@ -347,6 +348,7 @@ public JPanel getPuzzleMenu(String selected)
         int currEvalOutput = 0;
 
         HillClimbing hClimb = new HillClimbing(bg.getPuzzleArr(), n);
+        hClimb.setVisited(visited);
 
         for(int iterations = 0; iterations < iter; iterations++)
         {
@@ -375,26 +377,26 @@ public JPanel getPuzzleMenu(String selected)
           {
             //Set the new evaluation output
             maxEvalOutput = currEvalOutput;
-            bg = new ButtonGrid(hClimb.getNewPuzzle(), n);
-            tabPane.setComponentAt(1, bg.getContentPane());
-            //Call ButtonGrid constructor to create the puzzle moves pane
-            puzzleMoves = new ButtonGrid(visited, n);
-            tabPane.setComponentAt(2,puzzleMoves.getContentPane());
-
-            dataPane = new DataPane(puzzleMoves.getEvaluationOutput());
-            tabPane.setComponentAt(3,dataPane);
+            hClimb.setCurrPuzzle(hClimb.getNewPuzzle());
+            hClimb.setVisited(visited);
             //bestPuzzleFile.createNewFile();
           }
-
           maxEvalFile.println(maxEvalOutput);
         }
         //Calculate the end time and the total time by subtracting end from start
         long endTime = System.currentTimeMillis();
         long evaluationTime = endTime - startTime;
 
+        bg = new ButtonGrid(hClimb.getCurrPuzzle(), n);
+        tabPane.setComponentAt(1, bg.getContentPane());
+        visited = hClimb.getVisited();
+        puzzleMoves = new ButtonGrid(visited,n);
+        tabPane.setComponentAt(2,puzzleMoves.getContentPane());
+
         dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
         tabPane.setComponentAt(3,dataPane);
         maxEvalFile.close();
+
       }//end basic Hill Climbing action listener
 
       if(source == cancel)
@@ -402,5 +404,7 @@ public JPanel getPuzzleMenu(String selected)
         setVisible(false);
         MainMenu mainMenu = new MainMenu();
       }
+
+
   }//end action listener here
 }
