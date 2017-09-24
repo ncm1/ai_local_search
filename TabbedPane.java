@@ -327,9 +327,9 @@ public JPanel HillClimbingRandomRestartsMenu(){
   sizeBox.addItem(9);
   sizeBox.addItem(11);
 
-  for(int i = 100; i <= 100000; i+= 100)
+  for(int i = 10; i <= 10000; i+= 10)
     iterBox.addItem(i);
-  for(int j = 10; j <= 1000; j+= 10)
+  for(int j = 10; j <= 100000; j+= 10)
     restartBox.addItem(j);
 
   //Add generate icon as a button on the gui
@@ -477,10 +477,7 @@ public void basicHillApproach(){
 
     int sqr = n*n;
     int[] visited = new int[sqr];
-    int[][] currBestPuzzle = new int[n][n];
-    int[][] tempPuzzle     = new int[n][n];
     bg = new ButtonGrid(n,n);
-    currBestPuzzle = bg.getPuzzleArr();
     Graph g = bg.getGraph();
     visited = g.bfs(0);
 
@@ -490,7 +487,7 @@ public void basicHillApproach(){
     //create a currEvalOutput variable to compare to the maxEvalOutput
     int currEvalOutput = 0;
 
-    HillClimbing hClimb = new HillClimbing(currBestPuzzle, n);
+    HillClimbing hClimb = new HillClimbing(bg.getPuzzleArr(), n);
     hClimb.setVisited(visited);
 
     for(int iterations = 0; iterations < iter; iterations++)
@@ -509,16 +506,6 @@ public void basicHillApproach(){
       bg.evaluationFunction(visited,n);
       currEvalOutput = bg.getEvaluationOutput();
 
-      /*
-          FOR DEBUGGING CAN BE REMOVED TO IMPROVE PERFORMANCE
-      */
-
-      //System.out.println("maxEvalOutput: " + maxEvalOutput);
-      //bg.printArr(hClimb.getbestPuzzle());
-      //System.out.println("currEvalOutput: " + currEvalOutput);
-      //bg.printArr(hClimb.getNewPuzzle());
-      //System.out.println("Curr")
-
       if(currEvalOutput >= maxEvalOutput)
       {
         //Set the new evaluation output
@@ -527,6 +514,10 @@ public void basicHillApproach(){
         hClimb.setVisited(visited);
         //bestPuzzleFile.createNewFile();
       }
+      //Don't accept the change
+      else
+        hClimb.revertLastMove();
+
       //maxEvalFile.println(maxEvalOutput);
     }//end for loop
 
@@ -609,6 +600,9 @@ public void hillClimbingRandomRestartApproach(){
         hClimb.setVisited(visited);
         //System.out.println(maxEvalOutput);
       }
+      //Don't accept the change
+      else
+        hClimb.revertLastMove();
       //maxEvalFile.println(maxEvalOutput);
     }//end iteration loop
     hClimb.randomResetNewPuzzle();
