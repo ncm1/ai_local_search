@@ -103,7 +103,7 @@ public class HillClimbing
     if(v < n)
       return 0;
     else
-      return v / n;
+      return v % n;
   }
 
   public int getYCell(int v, int n)

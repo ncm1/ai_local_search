@@ -2,13 +2,35 @@ import java.util.*;
 import java.io.*;
 
 public class Puzzle{
+/**
+* This class is very similar to buttongrid. It removes the display portions of buttongrid.
+* This allows for fast generation of random puzzles
+* If one wants to display a puzzle object, they can simply call the ButtonGrid constructor ( ButtonGrid(puzzleArr, length) )
+*/
+
     int[][] puzzleArr;
     private Graph g;
     private int evaluationOutput;
     int n ;
+    String candidate;
 
-
-    public Puzzle(int width, int length){
+  public Puzzle(int[][] newPuzzleArray, int n ){
+    /**
+    * Create a puzzle object from a 2d int array
+    */
+    puzzleArr = new int[n][n];
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < n; j++){
+            puzzleArr[i][j] = newPuzzleArray[i][j];
+        }
+    }
+    this.n = n;
+    generateDigraph(puzzleArr, n);
+  }
+  public Puzzle(int width, int length){
+    /**
+    * Create a new random puzzle object from 2 dimensions
+    */
       Random randy = new Random();
       int max = width - 1;
       int min = 1;
@@ -40,12 +62,25 @@ public class Puzzle{
                 //grid[x][y] = new JButton(holder + "{" + vert + "}");
                 puzzleArr[x][y] = holder;              //Add move to puzzle
               }
-            }
-        }
-        //Create the digraph where the goal is located at n^2 - 1
-        generateDigraph(puzzleArr, width);
+          }
+      }
+      //Create the digraph where the goal is located at n^2 - 1
+      generateDigraph(puzzleArr, width);
     }
-
+  	public Puzzle (int n, boolean stringRepresentation){
+	    this(n,n);
+      if (stringRepresentation){
+	        char chromosome;
+	        candidate = "";
+	        for (int x = 0; x < n; ++x){
+	            for (int y = 0; y < n; ++y){
+	              chromosome = (char) (96 + puzzleArr[x][y]); // in ascii, a = 97, b = 98, etc
+	              candidate.concat(""+chromosome);
+	            }
+	        }
+	    }
+      	System.out.println(candidate);
+	  }
 	public Puzzle(int[] puzzleArr){
 
       Random randy = new Random();
@@ -86,6 +121,23 @@ public class Puzzle{
         generateDigraph(compatabilityArr, width);
     }
 
+    public void randCellChange(){
+      /** Edit a random position in the puzzle to include a new jump value
+      */
+      Random randy = new Random();
+      int row; int col;
+      row = randy.nextInt(n-1);
+      col = randy.nextInt(n-1);
+      while ((row == n-1 && col == n-1) ){
+        row = randy.nextInt(n-1);
+        col = randy.nextInt(n-1);
+      }
+      int jumpVal = randy.nextInt( getMaxLegalJump(row,col,n) );
+
+      puzzleArr[col][row] = jumpVal;
+      generateDigraph(puzzleArr, n);
+    }
+
     public Graph getGraph(){
       return g;
     }
@@ -102,17 +154,17 @@ public class Puzzle{
     }
 
     public int getMaxLegalJump(int row, int col, int max){
-		int a = max - row;
+		int a = max - row; // a = max row cells it can jump
 		int b = row - 1;
-		int c = max - col;
+		int c = max - col; // c = max col cells it can jump
 		int d = col - 1;
 
 		int[] tempArray = {b, c, d};
-		int tempMax = a;
+		int tempMax = a; 
 
 		for(int i = 0; i < 3; i++){
-		if(tempMax < tempArray[i])
-			tempMax = tempArray[i];
+  		if(tempMax < tempArray[i])
+  			tempMax = tempArray[i];
 		}
 		return tempMax;
 	}

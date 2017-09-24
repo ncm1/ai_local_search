@@ -62,17 +62,73 @@ JButton basicHillGenerate;
 JButton simulatedAnnealingGenerate;
 JButton populationApproachGenerate;
 
+//Simulated Annealing
 //JTextField initTempField = new JTextField();
 //JTextField tempDecayRateField = new JTextField();
 JComboBox initTempField = new JComboBox();
 JComboBox tempDecayRateField = new JComboBox();
 
+//population approach
 JComboBox iterEndTimeBox = new JComboBox();
 /*
 public JPanel PopulationPuzzleMenu(){
 
 }
 */
+
+public JPanel populationApproachPuzzleMenu(){
+  JPanel pane = new JPanel();
+
+  setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  pane.setLayout(null);
+  JLabel title  = new JLabel("Population Approach Puzzle Menu");
+  title.setBounds(150,50,600,100);
+  Font font = new Font("Cambria", Font.BOLD, 30);
+  title.setFont(font);
+
+  JLabel sizePrompt = new JLabel("Size:");
+  JLabel iterEndTimePrompt = new JLabel("Set time limit to iterate over: ");
+  sizeBox.addItem(5);
+  sizeBox.addItem(7);
+  sizeBox.addItem(9);
+  sizeBox.addItem(11);
+  sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
+
+  for(int i = 20; i <= 5000; i+= 20)
+    iterEndTimeBox.addItem(i);
+  ImageIcon generate_Icon  = new ImageIcon("icons/generate.png");
+  populationApproachGenerate = new JButton(generate_Icon);
+  ImageIcon cancel_Icon = new ImageIcon("icons/back.png");
+  cancel = new JButton(cancel_Icon);
+
+  populationApproachGenerate.setBounds(600,480,150,44);
+  cancel.setBounds(100,480,120,44);
+  sizePrompt.setBounds(120, 40, 200, 200);
+  sizeBox.setBounds(120, 150, 200, 100);
+  iterEndTimePrompt.setBounds(120, 190, 250,200);
+  iterEndTimeBox.setBounds(120, 300, 200, 100);
+
+  populationApproachGenerate.addActionListener(this);
+  cancel.addActionListener(this);
+  sizeBox.addActionListener(this);
+  iterEndTimeBox.addActionListener(this);
+  //System.out.println("I'm here at least");
+
+  //Add the title, prompt, sizebox, and generate icon to the interface
+  pane.add(title);
+  pane.add(sizePrompt);
+  pane.add(sizeBox);
+  pane.add(iterBox);
+  pane.add(iterEndTimePrompt);
+  pane.add(iterEndTimeBox);
+  pane.add(cancel);
+
+  getContentPane().add(pane);
+  setSize(800,600);
+  setVisible(true);
+
+  return pane;
+}
 
 public JPanel SimulatedAnnealingPuzzleMenu() {
   JPanel pane = new JPanel();
@@ -335,10 +391,9 @@ public JPanel getPuzzleMenu(String selected) {
     puzzleMenuPanel = SimulatedAnnealingPuzzleMenu();
     return puzzleMenuPanel;
   }
-  //TODO: IMPLEMENT!
   else if(selected == "Population Based Approach"){
-    //puzzleMenuPanel = PopulationPuzzleMenu();
-    //return puzzleMenuPanel;
+    puzzleMenuPanel = populationApproachPuzzleMenu();
+    return puzzleMenuPanel;
   }
   return puzzleMenuPanel;
 }
@@ -405,7 +460,7 @@ public void basicHillApproach(){
     int sqr = n*n;
     int[] visited = new int[sqr];
     int[][] currBestPuzzle = new int[n][n];
-    int[][] tempPuzzle     = new int[n][n];
+    int[][] finalPuzzle     = new int[n][n];
     bg = new ButtonGrid(n,n);
     currBestPuzzle = bg.getPuzzleArr();
     Graph g = bg.getGraph();
@@ -489,46 +544,59 @@ public void simulatedAnnealingApproach(){
         Random randy = new Random();
         
         int val;
-        Puzzle puz = new Puzzle(n,n);
-        puz.evaluationFunction(puz.getGraph().bfs(0), n);
+        Puzzle finalPuzzle = new Puzzle(n,n);
+        finalPuzzle.evaluationFunction(finalPuzzle.getGraph().bfs(0), n);
         
-        int prevVal = puz.getEvaluationOutput();
-        
-        Puzzle puzzleBG = puz; 
+        int prevVal = finalPuzzle.getEvaluationOutput();
+        Puzzle changedPuz; 
         //iteration loop
+
         for (int i = 0; i < iter; ++i){
           temp = temp * decayRate;
-          puz = new Puzzle(n,n);
-          puz.evaluationFunction(puz.getGraph().bfs(0), n);
-          val = puz.getEvaluationOutput(); // val is evaluation value
+          
+          //System.out.println("temp:" + temp);
+          changedPuz = new Puzzle(finalPuzzle.puzzleArr, n);
+          changedPuz.randCellChange();
+          changedPuz.evaluationFunction(changedPuz.getGraph().bfs(0), n);
+          val = changedPuz.getEvaluationOutput(); // val is evaluation value
           if ( val > prevVal){ // if evaluation value of current puzzle config is greater than ev. value of previous puzzle config
            prevVal = val;
-           puzzleBG = puz;
+           finalPuzzle = changedPuz;
           }
           else if ( val <= prevVal){ // if evaluation value of current puzzle config is lte than ev. value of previous puzzle config
-            if (randy.nextFloat() < Math.exp((double)(val - prevVal )/temp)){ //  probability condition met
-              prevVal = val;
-              puzzleBG = puz;
-            }
-            else {// probability failed // taking higher value
-              prevVal = prevVal;
-            }
+        	  //System.out.println("prevVal" + prevVal);
+        	  //System.out.println("Val" + val);
+        	  //System.out.println( Math.exp((double)(val - prevVal )/temp) );
+        	  if (randy.nextFloat() < Math.exp((double)(val - prevVal )/temp)){ //  probability condition met
+            	
+	              prevVal = val;
+	              finalPuzzle = changedPuz;
+        	  }
+        	  else {// probability failed // taking higher value
+        		  prevVal = prevVal;
+        	  }
           }
           temp = temp*decayRate; //apply decay to temp
           //System.out.println(temp);
+          //System.out.println("prevVal:" + prevVal);
        }
+        finalPuzzle.evaluationFunction(finalPuzzle.getGraph().bfs(0),n);
+        //System.out.println("eval output:" + finalPuzzle.getEvaluationOutput());
+
         long endTime = System.currentTimeMillis();
         long evaluationTime = endTime - startTime;
-        bg = new ButtonGrid(puzzleBG.puzzleArr,puzzleBG.n);
+        bg = new ButtonGrid(finalPuzzle.puzzleArr,finalPuzzle.n);
         tabPane.setComponentAt(1, bg.getContentPane());
-        puzzleMoves = new ButtonGrid(puzzleBG.getGraph().bfs(0), n);
+        puzzleMoves = new ButtonGrid(finalPuzzle.getGraph().bfs(0), n);
         tabPane.setComponentAt(2,puzzleMoves.getContentPane());
-        dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
+        int[] k = bg.getGraph().bfs(0);
+        bg.evaluationFunction(k, n);
+        dataPane = new DataPane(bg.getEvaluationOutput(), evaluationTime);
         tabPane.setComponentAt(3,dataPane);
 }
 
 public void populationApproach(){
-  int n = (int)sizeBox.getSelectedItem();
+        int n = (int)sizeBox.getSelectedItem();
         long iterEndTime = (int)iterEndTimeBox.getSelectedItem();
         
         //tabPane.setComponentAt(1, bg.getContentPane());
@@ -544,11 +612,11 @@ public void populationApproach(){
         
         int prevVal = bg.getEvaluationOutput();
         
-        ButtonGrid puzzleBG = bg; 
+        ButtonGrid finalPuzzle = bg; 
         //iteration loop
         long elapsedTime = 0;
+        Puzzle puzz = new Puzzle(n,true);
         for (int i = 0; i < 10000000; ++i){
-          
            //System.out.println(temp);
           endTime = System.currentTimeMillis();
           evaluationTime = endTime - startTime;
@@ -558,8 +626,8 @@ public void populationApproach(){
           }
        }
          
-        tabPane.setComponentAt(1, puzzleBG.getContentPane());
-        puzzleMoves = new ButtonGrid(puzzleBG.getGraph().bfs(0), n);
+        tabPane.setComponentAt(1, finalPuzzle.getContentPane());
+        puzzleMoves = new ButtonGrid(finalPuzzle.getGraph().bfs(0), n);
         tabPane.setComponentAt(2,puzzleMoves.getContentPane());
         //dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
         tabPane.setComponentAt(3,dataPane);

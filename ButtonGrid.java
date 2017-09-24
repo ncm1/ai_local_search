@@ -215,6 +215,7 @@ public class ButtonGrid extends JFrame {
         //setVisible(true); //makes frame visible
         setSize(800,600);
         //printArr(puzzleArr);
+        generateDigraph(puzzleArr, width);
     }
         /*
         PRECONDITION: generateDigraph() is called
