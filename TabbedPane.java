@@ -12,9 +12,13 @@ import javax.swing.text.NumberFormatter;
 
 import java.io.*;
 
+
+
 public class TabbedPane extends JFrame implements ActionListener
 {
   //Create main tabePane object where each of the tabs will be placed
+  static final String FILENAME = "./basicHillClimbingPuzzles/";
+
   JTabbedPane tabPane;
 
   DataPane dataPane     = new DataPane();
@@ -61,6 +65,7 @@ JComboBox iterBox = new JComboBox();
 JButton basicHillGenerate;
 JButton simulatedAnnealingGenerate;
 JButton populationApproachGenerate;
+JButton sa50times;
 
 //Simulated Annealing
 //JTextField initTempField = new JTextField();
@@ -153,7 +158,7 @@ public JPanel SimulatedAnnealingPuzzleMenu() {
   sizeBox.addItem(9);
   sizeBox.addItem(11);
 
-  for(int i = 10; i <= 100000; i+= 250)
+  for(int i = 250; i <= 100000; i+= 250)
     iterBox.addItem(i);
 
   for (float i = 0; i <= 1000; i=i+1){
@@ -164,6 +169,7 @@ public JPanel SimulatedAnnealingPuzzleMenu() {
   //Add generate icon as a button on the gui
   ImageIcon generate_Icon  = new ImageIcon("icons/generate.png");
   simulatedAnnealingGenerate = new JButton(generate_Icon);
+  sa50times = new JButton(generate_Icon);
   ImageIcon cancel_Icon = new ImageIcon("icons/back.png");
   cancel = new JButton(cancel_Icon);
 
@@ -184,6 +190,10 @@ public JPanel SimulatedAnnealingPuzzleMenu() {
   iterBox.addActionListener(this);
   initTempField.addActionListener(this);
   tempDecayRateField.addActionListener(this);
+  
+  sa50times.setBounds(10,10,150,44);
+  sa50times.addActionListener(this);
+  pane.add(sa50times);
   //System.out.println("I'm here at least");
 
   //Add the title, prompt, sizebox, and generate icon to the interface
@@ -319,7 +329,7 @@ public JPanel BasicHillClimbingPuzzleMenu() {
   sizeBox.addItem(9);
   sizeBox.addItem(11);
 
-  for(int i = 10; i <= 100000; i+= 250)
+  for(int i = 250; i <= 100000; i+= 250)
     iterBox.addItem(i);
 
   //Add generate icon as a button on the gui
@@ -532,6 +542,7 @@ public void basicHillApproach(){
 }
 
 public void simulatedAnnealingApproach(){
+        LinkedList<Integer> evalValueArray = new LinkedList<Integer>();
         int n = (int)sizeBox.getSelectedItem();
         int iter = (int)iterBox.getSelectedItem();
         float initTemp = (Float) initTempField.getSelectedItem();
@@ -544,13 +555,15 @@ public void simulatedAnnealingApproach(){
         Random randy = new Random();
         
         int val;
-        Puzzle finalPuzzle = new Puzzle(n,n);
-        finalPuzzle.evaluationFunction(finalPuzzle.getGraph().bfs(0), n);
+        int prevVal;
+        Puzzle finalPuzzle;
         
-        int prevVal = finalPuzzle.getEvaluationOutput();
-        Puzzle changedPuz; 
+        finalPuzzle = new Puzzle(n,n);
+        finalPuzzle.evaluationFunction(finalPuzzle.getGraph().bfs(0), n);
+        prevVal = finalPuzzle.getEvaluationOutput();
+        Puzzle changedPuz;
         //iteration loop
-
+        evalValueArray.add(prevVal);
         for (int i = 0; i < iter; ++i){
           temp = temp * decayRate;
           
@@ -577,6 +590,7 @@ public void simulatedAnnealingApproach(){
         	  }
           }
           temp = temp*decayRate; //apply decay to temp
+          evalValueArray.add(prevVal);
           //System.out.println(temp);
           //System.out.println("prevVal:" + prevVal);
        }
@@ -593,14 +607,33 @@ public void simulatedAnnealingApproach(){
         bg.evaluationFunction(k, n);
         dataPane = new DataPane(bg.getEvaluationOutput(), evaluationTime);
         tabPane.setComponentAt(3,dataPane);
+        //write to file
+        writeEvaluationArrayToFile(FILENAME + "maxEvalSA9.txt", evalValueArray);
+
 }
+
+public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> evalValueArray){
+        PrintWriter maxEvalFile = null;
+        try{
+          maxEvalFile = new PrintWriter(new FileWriter(filename, true));
+        }catch (IOException i) {
+          // TODO Auto-generated catch block
+          i.printStackTrace();
+        }
+        int arrayMaxSize = evalValueArray.size();
+        for(int i =0; i < arrayMaxSize; i++){
+        	maxEvalFile.write(Integer.toString(evalValueArray.removeFirst() ) + " "  );
+        }
+        maxEvalFile.flush();
+        maxEvalFile.close();
+}	
 
 public void populationApproach(){
         int n = (int)sizeBox.getSelectedItem();
         long iterEndTime = (int)iterEndTimeBox.getSelectedItem();
         
         //tabPane.setComponentAt(1, bg.getContentPane());
-        long startTime = System.currentTimeMillis();
+        long startTime;
         long endTime;
         long evaluationTime;
 
@@ -614,6 +647,7 @@ public void populationApproach(){
         
         ButtonGrid finalPuzzle = bg; 
         //iteration loop
+        startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         Puzzle puzz = new Puzzle(n,true);
         for (int i = 0; i < 10000000; ++i){
@@ -656,6 +690,11 @@ public void populationApproach(){
     }
     if(source == simulatedAnnealingGenerate){
       simulatedAnnealingApproach();    
+    }
+    if(source == sa50times){
+    	for(int j = 0; j < 50; ++j){
+    		simulatedAnnealingApproach();
+    	}
     }
     if(source == populationApproachGenerate){
       populationApproach();   

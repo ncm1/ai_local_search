@@ -1,4 +1,4 @@
-fid = fopen('maxEval.txt','r');
+fid = fopen('maxEvalSA.txt','r');
 s = fscanf(fid,'%d ',2500000);
 fclose(fid);
 
@@ -17,6 +17,6 @@ for start = 1:50000
 end
 
 plot(1:50000,finalMatrix)
-title('Basic Hill Climbing n = 5');
+title('SA n = 11');
 xlabel('Average per iteration over 50 trials');
 ylabel('Moves to goal');
