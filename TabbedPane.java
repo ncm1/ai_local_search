@@ -2,14 +2,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.lang.*;
 import java.math.*;
-import java.text.NumberFormat;
+import java.text.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.JComboBox;
-import javax.swing.JTable;
-import javax.swing.table.*;
-import javax.swing.text.NumberFormatter;
-
 import java.io.*;
 
 public class TabbedPane extends JFrame implements ActionListener
@@ -61,7 +56,9 @@ JComboBox iterBox = new JComboBox();
 JButton basicHillGenerate;
 //Hill Climbing with random restarts needs number of restarts
 JComboBox restartBox = new JComboBox();
+JComboBox probabilityBox = new JComboBox();
 JButton hillClimbRestartsGenerate;
+JButton hillClimbWalkGenerate;
 JButton simulatedAnnealingGenerate;
 JButton populationApproachGenerate;
 
@@ -375,6 +372,80 @@ public JPanel HillClimbingRandomRestartsMenu(){
   return pane;
 }
 
+public JPanel HillClimbingRandomWalkMenu(){
+
+  JPanel pane = new JPanel();
+
+  setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  pane.setLayout(null);
+
+  //Setting the Title and location
+  JLabel title  = new JLabel("Hill Climbing with Random Walk Main Menu");
+  title.setBounds(75,10,700,100);
+  Font font = new Font("Cambria", Font.BOLD, 25);
+  title.setFont(font);
+
+  JLabel sizePrompt = new JLabel("Please select a size n");
+  JLabel iterPrompt = new JLabel("Please select the number of iterations per process:");
+  JLabel probabilityPrompt = new JLabel("Please select the probability of restart");
+
+  //Setting the default text to display
+  sizeBox.setPrototypeDisplayValue("Size");
+  //Populate the sizebox with the possible puzzle sizes
+  sizeBox.addItem(5);
+  sizeBox.addItem(7);
+  sizeBox.addItem(9);
+  sizeBox.addItem(11);
+
+  for(int i = 1000; i <= 100000; i+= 250)
+    iterBox.addItem(i);
+
+  //DecimalFormat df = new DecimalFormat("#.00");
+  for(int j = 0; j <= 100; j+= 1)
+    probabilityBox.addItem(j);
+
+  //Add generate icon as a button on the gui
+  ImageIcon generate_Icon  = new ImageIcon("icons/generate.png");
+  hillClimbWalkGenerate = new JButton(generate_Icon);
+  ImageIcon cancel_Icon = new ImageIcon("icons/back.png");
+  cancel = new JButton(cancel_Icon);
+
+  hillClimbWalkGenerate.setBounds(520,400,150,44);
+  cancel.setBounds(150,390,150,44);
+
+  sizePrompt.setBounds(300, 20, 200, 200);
+  sizeBox.setBounds(270, 100, 200, 100);
+
+  iterPrompt.setBounds(260, 105, 250,200);
+  iterBox.setBounds(280, 195, 200, 100);
+
+  probabilityPrompt.setBounds(260, 195, 250, 200);
+  probabilityBox.setBounds(280,295, 200, 100);
+
+  hillClimbWalkGenerate.addActionListener(this);
+  cancel.addActionListener(this);
+  sizeBox.addActionListener(this);
+  iterBox.addActionListener(this);
+  probabilityBox.addActionListener(this);
+
+  //Add the title, prompt, sizebox, and generate icon to the interface
+  pane.add(title);
+  pane.add(sizePrompt);
+  pane.add(sizeBox);
+  pane.add(iterBox);
+  pane.add(probabilityBox);
+  pane.add(iterPrompt);
+  pane.add(probabilityPrompt);
+  pane.add(hillClimbWalkGenerate);
+  pane.add(cancel);
+
+  getContentPane().add(pane);
+  setSize(800,600);
+  setVisible(true);
+
+  return pane;
+}
+
 public JPanel getPuzzleMenu(String selected) {
   JPanel puzzleMenuPanel = new JPanel();
   //Basic Puzzle Evaluation is for generating random puzzles, generally
@@ -394,15 +465,15 @@ public JPanel getPuzzleMenu(String selected) {
     puzzleMenuPanel = BasicHillClimbingPuzzleMenu();
     return puzzleMenuPanel;
   }
-  //TODO: IMPLEMENT!
+  //TODO: Generate Graphs!
   else if(selected == "Hill Climbing with Random Restarts"){
     puzzleMenuPanel = HillClimbingRandomRestartsMenu();
     return puzzleMenuPanel;
   }
-  //TODO: IMPLEMENT!
+  //TODO: Generate Graphs!
   else if(selected == "Hill Climbing with Random Walk"){
-    //puzzleMenuPanel = BasicPuzzleMenu();
-    //return puzzleMenuPanel;
+    puzzleMenuPanel = HillClimbingRandomWalkMenu();
+    return puzzleMenuPanel;
   }
 
   else if(selected == "Simulated Annealing"){
@@ -626,6 +697,111 @@ public void hillClimbingRandomRestartApproach(){
   //maxEvalFile.close();
 }
 
+public void hillClimbingRandomWalkApproach(){
+  /*PrintWriter maxEvalFile = null;
+    try{
+      maxEvalFile = new PrintWriter(new FileWriter("./basicHillClimbingPuzzles/maxEval.txt", true));
+    }catch (IOException i) {
+    // TODO Auto-generated catch block
+    i.printStackTrace();
+  }*/
+
+  long startTime = System.currentTimeMillis();
+
+  int n    = (int)sizeBox.getSelectedItem();
+  int iter = (int)iterBox.getSelectedItem();
+  int userProb = (int)probabilityBox.getSelectedItem();
+
+  int currEvalOutput;
+  int maxEvalOutput;
+
+  //Create a random new puzzle to begin with
+  bg = new ButtonGrid(n,n);
+  //Getting the corresponding graph to get the moves array
+  Graph g = bg.getGraph();
+  //visited array will represent the moves array
+  int[] visited = new int[n*n];
+  visited = g.bfs(0);
+  //set visited to the set of puzzle moves and finally compare
+  //the evaluation output
+  //Call ButtonGrid constructor to create the puzzle moves pane
+  puzzleMoves = new ButtonGrid(visited, n);
+  //get the evalOutput for the first puzzle
+  maxEvalOutput = puzzleMoves.getEvaluationOutput();
+  bg.evaluationFunction(visited,n);
+  //get the evalOutput for the first puzzle and set as max
+  maxEvalOutput = puzzleMoves.getEvaluationOutput();
+
+  HillClimbing hClimb = new HillClimbing(bg.getPuzzleArr(), n);
+  hClimb.setVisited(visited);
+
+  Random randy = new Random();
+  int max = 100;
+  int min = 1;
+  int result;
+  int reverted = 0;
+
+  for(int j = 0; j < iter; j++)
+  {
+    hClimb.hillClimb();
+    //Generate the new directed graph and perform bfs
+    bg.generateDigraph(hClimb.getNewPuzzle(), n);
+    g = bg.getGraph();
+    //set visited to the set of puzzle moves and finally compare
+    //the evaluation output
+    visited = g.bfs(0);
+    //We need to get the new evaluation function output now, we can use
+    //the method avaliable in the ButtonGrid class
+    bg.evaluationFunction(visited,n);
+    currEvalOutput = bg.getEvaluationOutput();
+
+    if(currEvalOutput >= maxEvalOutput)
+    {
+      //Set the new evaluation output
+      maxEvalOutput = currEvalOutput;
+      hClimb.setbestPuzzleToNew(hClimb.getNewPuzzle());
+      hClimb.setVisited(visited);
+      //System.out.println(maxEvalOutput);
+    }
+    //Don't accept the change with probability q = 1 - p given by user
+    else
+    {
+      result = randy.nextInt(max - min + 1) + min;
+      System.out.println("result: " + result);
+      System.out.println("userProb: " + userProb);
+
+      if(result > userProb){
+        hClimb.revertLastMove();
+        System.out.println("Reverting...");
+        reverted++;
+      }
+      else
+        System.out.println("Not reverting...");
+    }
+      //maxEvalFile.println(maxEvalOutput);
+  }//end iteration loop
+  System.out.println("Reverted: " + reverted);
+  System.out.println("Didn't revert: " + (iter - reverted));
+
+    //System.out.println("Random reset puzzle: ");
+    //bg.printArr(hClimb.getNewPuzzle());
+    //maxEvalOutput = bg.getEvaluationOutput()
+  //Calculate the end time and the total time by subtracting end from start
+  long endTime = System.currentTimeMillis();
+  long evaluationTime = endTime - startTime;
+
+  bg = new ButtonGrid(hClimb.getbestPuzzle(), n);
+  tabPane.setComponentAt(1, bg.getContentPane());
+
+  visited = hClimb.getVisited();
+  puzzleMoves = new ButtonGrid(visited,n);
+  tabPane.setComponentAt(2,puzzleMoves.getContentPane());
+
+  dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
+  tabPane.setComponentAt(3,dataPane);
+  //maxEvalFile.close();
+}
+
 public void simulatedAnnealingApproach(){
         int n = (int)sizeBox.getSelectedItem();
         int iter = (int)iterBox.getSelectedItem();
@@ -738,6 +914,9 @@ public void populationApproach(){
     }
     if(source == hillClimbRestartsGenerate){
       hillClimbingRandomRestartApproach();
+    }
+    if(source == hillClimbWalkGenerate){
+      hillClimbingRandomWalkApproach();
     }
     if(source == simulatedAnnealingGenerate){
       simulatedAnnealingApproach();
