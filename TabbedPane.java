@@ -10,6 +10,9 @@ import javax.swing.JTable;
 import javax.swing.table.*;
 import javax.swing.text.NumberFormatter;
 
+import com.sun.java_cup.internal.runtime.Symbol;
+import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
+
 import java.io.*;
 
 
@@ -75,6 +78,8 @@ JComboBox tempDecayRateField = new JComboBox();
 
 //population approach
 JComboBox iterEndTimeBox = new JComboBox();
+JComboBox populationSizeBox = new JComboBox();
+JComboBox mutationProbBox = new JComboBox();
 /*
 public JPanel PopulationPuzzleMenu(){
 
@@ -93,6 +98,8 @@ public JPanel populationApproachPuzzleMenu(){
 
   JLabel sizePrompt = new JLabel("Size:");
   JLabel iterEndTimePrompt = new JLabel("Set time limit to iterate over: ");
+  JLabel populationSizePrompt = new JLabel("Set the initial population size: ");
+  
   sizeBox.addItem(5);
   sizeBox.addItem(7);
   sizeBox.addItem(9);
@@ -101,6 +108,8 @@ public JPanel populationApproachPuzzleMenu(){
 
   for(int i = 20; i <= 5000; i+= 20)
     iterEndTimeBox.addItem(i);
+  for(int j = 2; j <= 1000; j+= 2)
+    populationSizeBox.addItem(j);
   ImageIcon generate_Icon  = new ImageIcon("icons/generate.png");
   populationApproachGenerate = new JButton(generate_Icon);
   ImageIcon cancel_Icon = new ImageIcon("icons/back.png");
@@ -112,11 +121,23 @@ public JPanel populationApproachPuzzleMenu(){
   sizeBox.setBounds(120, 150, 200, 100);
   iterEndTimePrompt.setBounds(120, 190, 250,200);
   iterEndTimeBox.setBounds(120, 300, 200, 100);
+  populationSizePrompt.setBounds(450,40,250,200);
+  populationSizeBox.setBounds(450,150,200,100);
+  
+  JLabel mutationProbPrompt = new JLabel("Set the probability for mutation /100:");
+  mutationProbPrompt.setBounds(450,190,250,200);
+  mutationProbBox.setBounds(450,300,200,100);
+  mutationProbBox.addActionListener(this);
+  for( float i =0; i <= 1000; ++i)
+	  mutationProbBox.addItem((float)i/1000);
 
   populationApproachGenerate.addActionListener(this);
+  pane.add(populationApproachGenerate);
   cancel.addActionListener(this);
   sizeBox.addActionListener(this);
   iterEndTimeBox.addActionListener(this);
+  populationSizeBox.addActionListener(this);
+  
   //System.out.println("I'm here at least");
 
   //Add the title, prompt, sizebox, and generate icon to the interface
@@ -127,6 +148,10 @@ public JPanel populationApproachPuzzleMenu(){
   pane.add(iterEndTimePrompt);
   pane.add(iterEndTimeBox);
   pane.add(cancel);
+  pane.add(populationSizePrompt);
+  pane.add(populationSizeBox);
+  pane.add(mutationProbPrompt);
+  pane.add(mutationProbBox);
 
   getContentPane().add(pane);
   setSize(800,600);
@@ -629,43 +654,118 @@ public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> eval
 }	
 
 public void populationApproach(){
+	/**
+	 * puzzVal refers to the evaluation function value
+	 */
         int n = (int)sizeBox.getSelectedItem();
         long iterEndTime = (int)iterEndTimeBox.getSelectedItem();
+        int initialPop = (int)populationSizeBox.getSelectedItem();
+        float mutationProb = (float) mutationProbBox.getSelectedItem();
         
         //tabPane.setComponentAt(1, bg.getContentPane());
-        long startTime;
-        long endTime;
-        long evaluationTime;
+        long startTime, popGenStartTime;
+        long elapsedTime = 0;
 
         Random randy = new Random();
-        
-        int val;
-        bg = new ButtonGrid(n,n);
-        bg.evaluationFunction(bg.getGraph().bfs(0), n);
-        
-        int prevVal = bg.getEvaluationOutput();
-        
-        ButtonGrid finalPuzzle = bg; 
+        Puzzle puzz;
         //iteration loop
-        startTime = System.currentTimeMillis();
-        long elapsedTime = 0;
-        Puzzle puzz = new Puzzle(n,true);
-        for (int i = 0; i < 10000000; ++i){
-           //System.out.println(temp);
-          endTime = System.currentTimeMillis();
-          evaluationTime = endTime - startTime;
-          elapsedTime += evaluationTime;
-          if (elapsedTime >= iterEndTime){
-            break;
-          }
-       }
-         
-        tabPane.setComponentAt(1, finalPuzzle.getContentPane());
-        puzzleMoves = new ButtonGrid(finalPuzzle.getGraph().bfs(0), n);
-        tabPane.setComponentAt(2,puzzleMoves.getContentPane());
-        //dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
-        tabPane.setComponentAt(3,dataPane);
+        
+        popGenStartTime = System.currentTimeMillis();
+        Puzzle p1, p2, c1, c2; // parent 1 parent 2 child 1 child 2
+        PuzzleOppositeComparator comp = new PuzzleOppositeComparator();
+        PriorityQueue<Puzzle> q = new PriorityQueue<Puzzle>(11,comp);
+        PriorityQueue<Puzzle> qTemp = new PriorityQueue<Puzzle>(11,comp); 
+        Random rand = new Random();
+        String a1, a2, b1, b2;
 
+        int numMutations;
+        int index;
+        char randChar;
+        int tempMove;
+        Puzzle puzzTemp;
+        Puzzle finalPuzzle;
+        int puzzTempEval;
+        
+        puzz = new Puzzle(n,true);
+        puzz.evaluationFunction(puzz.getGraph().bfs(0),puzz.n);
+        q.add(puzz);
+        for (int i = 1; i < initialPop; ++i){ //initialize population
+          puzz = new Puzzle(n,true);
+          puzz.evaluationFunction(puzz.getGraph().bfs(0),n);
+          q.add(puzz);
+        }
+        elapsedTime = System.currentTimeMillis() - popGenStartTime;
+        int iter = 0;
+        int startSize;
+        do{
+        	startTime = System.currentTimeMillis();
+	        numMutations = puzz.candidate.length();
+	        //crossover and mutation
+	        startSize = q.size();
+	        for (int i = 0; i < startSize; i=i+1){
+	          //crossover
+		        p1 = q.poll();
+		        p2 = q.poll();
+	        	if ((p1!= null && p2!= null)){
+		          int crossOverPoint = rand.nextInt(p1.candidate.length());
+		          a1 = p1.candidate.substring(0,crossOverPoint);
+		          a2 = p1.candidate.substring(crossOverPoint);
+		          b1 = p2.candidate.substring(0,crossOverPoint);
+		          b2 = p2.candidate.substring(crossOverPoint);
+		          c1 = new Puzzle(a1+b2);
+		          c2 = new Puzzle(b1+a2);
+	        	}
+	        	else
+	        		break;
+	          //mutation
+	          for (int j = 0; j < 1; ++j){
+				if(j==0)
+				  puzzTemp = c1;
+				else
+				  puzzTemp = c2;
+				for(int k =0; k < numMutations; ++k){
+				  if (rand.nextFloat() <= mutationProb){
+				     index = rand.nextInt(puzzTemp.candidate.length());
+				     tempMove = puzzTemp.getMaxLegalJump(index/n, index%n, n);
+				     randChar = (char) (96 + tempMove);
+				     if (index == puzzTemp.candidate.length())
+				       puzzTemp.candidate = puzzTemp.candidate.substring(0, index) + randChar;
+				     else{
+				       puzzTemp.candidate = puzzTemp.candidate.substring(0, index) + randChar + puzzTemp.candidate.substring(index+1);
+				     }
+				  }
+				}
+	          }
+	          c1.stringToPuzzle(n);
+	          c2.stringToPuzzle(n);
+	          c1.evaluationFunction(c1.getGraph().bfs(0),c1.n);
+	          c2.evaluationFunction(c2.getGraph().bfs(0),c2.n);
+	          qTemp.add(p1);
+	          qTemp.add(p2);
+	          qTemp.add(c1);
+	          qTemp.add(c2);
+	        }
+	        //get the highest eval value
+			q = qTemp;
+			puzzTemp = q.peek();
+			puzzTempEval = puzzTemp.getEvaluationOutput(); // check these over time
+			//System.out.println(puzzTempEval);
+			finalPuzzle = puzzTemp;
+			elapsedTime += System.currentTimeMillis() - startTime;
+			if (elapsedTime >= iterEndTime){
+				break;
+			}
+			++iter;
+        }while(iter < 10000000);
+        for (int k = 0; k < q.size(); ++k){
+        	System.out.println(q.poll().getEvaluationOutput());
+        }
+        ButtonGrid finalPuzzleBG = new ButtonGrid(finalPuzzle.puzzleArr, n);
+        tabPane.setComponentAt(1, finalPuzzleBG.getContentPane());
+        puzzleMoves = new ButtonGrid(finalPuzzleBG.getGraph().bfs(0), n);
+        tabPane.setComponentAt(2,puzzleMoves.getContentPane());
+        dataPane = new DataPane(finalPuzzle.getEvaluationOutput(), iter);
+        tabPane.setComponentAt(3,dataPane);
 
 }
 

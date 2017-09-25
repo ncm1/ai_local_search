@@ -14,6 +14,10 @@ public class Puzzle{
     int n ;
     String candidate;
 
+  public Puzzle(String cand){
+	  this.candidate = cand;
+  }
+  
   public Puzzle(int[][] newPuzzleArray, int n ){
     /**
     * Create a puzzle object from a 2d int array
@@ -69,18 +73,30 @@ public class Puzzle{
     }
   	public Puzzle (int n, boolean stringRepresentation){
 	    this(n,n);
-      if (stringRepresentation){
+	    if (stringRepresentation){
 	        char chromosome;
 	        candidate = "";
 	        for (int x = 0; x < n; ++x){
 	            for (int y = 0; y < n; ++y){
 	              chromosome = (char) (96 + puzzleArr[x][y]); // in ascii, a = 97, b = 98, etc
-	              candidate.concat(""+chromosome);
+	              if(x== n-1 && y == n-1){
+	            	  break;
+	              }
+	              else
+	            	  candidate = candidate.concat(""+chromosome);
 	            }
 	        }
 	    }
-      	System.out.println(candidate);
+      	//System.out.println("candidate: "+ candidate);
 	  }
+  	public void stringToPuzzle(int n){
+  		puzzleArr = new int[n][n];
+  		for (int i = 0; i < candidate.length()-1; ++i){
+  			puzzleArr[i/n][i%n] = ((int)candidate.charAt(i)) - 96 ;	
+  		}
+  		puzzleArr[n-1][n-1] = 0;
+  		generateDigraph(puzzleArr, n);
+  	}
 	public Puzzle(int[] puzzleArr){
 
       Random randy = new Random();
@@ -117,10 +133,13 @@ public class Puzzle{
                 compatabilityArr[x][y] = puzzleArr[vert];      //consequence of not generalizing things
               }
             }
-        }
-        generateDigraph(compatabilityArr, width);
+      }
+      generateDigraph(compatabilityArr, width);
     }
 
+
+	   
+	   
     public void randCellChange(){
       /** Edit a random position in the puzzle to include a new jump value
       */
@@ -132,7 +151,7 @@ public class Puzzle{
         row = randy.nextInt(n-1);
         col = randy.nextInt(n-1);
       }
-      int jumpVal = randy.nextInt( getMaxLegalJump(row,col,n) );
+      int jumpVal = randy.nextInt( getMaxLegalJump(row,col,n) ) + 1;
 
       puzzleArr[col][row] = jumpVal;
       generateDigraph(puzzleArr, n);

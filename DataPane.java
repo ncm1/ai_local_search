@@ -15,6 +15,7 @@ public class DataPane extends JPanel
   JLabel title = new JLabel("Puzzle Data");
   JLabel evaluationFunc;
   JLabel evaluationTimeLabel;
+  JLabel iterationsLabel;
   JLabel prompt = new JLabel("Please select the size of n:");
 
     public DataPane()
@@ -63,6 +64,19 @@ public class DataPane extends JPanel
 
       add(evaluationFunc);
       add(evaluationTimeLabel);
+    }
+    public DataPane(int evaluation, int iterations){
+        Font font = new Font("Cambria", Font.BOLD, 30);
+        evaluationFunc = new JLabel("Evaluation function output: " + evaluation);
+        iterationsLabel = new JLabel("Total Iterations: " + iterations);
+        evaluationFunc.setFont(font);
+        iterationsLabel.setFont(font);
+
+        evaluationFunc.setBounds(520,400,180,70);
+        iterationsLabel.setBounds(520, 700, 180, 70);
+
+        add(evaluationFunc);
+        add(iterationsLabel);
     }
 
     public void paintComponent(Graphics g){
