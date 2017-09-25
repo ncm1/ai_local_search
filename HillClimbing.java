@@ -6,9 +6,11 @@ public class HillClimbing
   int[][] bestPuzzle;
   int[] visited;
   int n;
+  int randNonGoalCell;
+  int randNonGoalCellValue;
 
 
-  
+
   HillClimbing(int[][] arr, int n){
     // initializes new puzzle and best puzzle with given array
     this.n = n;
@@ -32,9 +34,8 @@ public class HillClimbing
     */
     int min = 0;          //Minimum non goal cell is the start cell
     int max = (n*n) - 2; //Maximum non goal cell is n^2 - 2, since n^2 - 1 is goal
-    int randNonGoalCell;
-    int randNonGoalCellValue;
-    
+
+
     Random randy = new Random();
     randNonGoalCell = randy.nextInt(max - min + 1) + min;
 
@@ -55,6 +56,51 @@ public class HillClimbing
     newPuzzle[x][y] = newLegalRandomMove; //set the new random legal move
   }
 
+  public void revertLastMove(){
+    int x = getXCell(randNonGoalCell,n);
+    int y = getYCell(randNonGoalCell,n);
+    newPuzzle[x][y] = randNonGoalCellValue;
+  }
+
+  public void randomResetNewPuzzle()
+  {
+    int length = n;
+    int width  = n;
+    int tempMax;
+    int holder;
+    int min = 1;
+    int max = n - 1;
+
+    Random randy = new Random();
+    int randNonGoalCellValue;
+    for(int x = 0; x < length; x++)
+    {
+        for(int y = 0; y < width; y++)
+        {
+            //Find the max legal jump
+            tempMax = getMaxLegalJump(x, y, max);
+            //get a random move that is valid in at least one direction
+            holder = randy.nextInt(tempMax - min + 1) + min;
+            //Check for the "Goal" condition
+            if(x == width - 1 && y == length - 1)
+            {
+              newPuzzle[x][y] = 0;
+            }
+            //Else add the random number to the grid
+            else
+            {
+              //change each cell such that is different from before
+              randNonGoalCellValue = bestPuzzle[x][y];
+              //Prevent the new random move from being the same
+              while(holder == randNonGoalCellValue)
+              {
+                holder = randy.nextInt(max - min + 1) + min;
+              }
+              newPuzzle[x][y] = holder;
+            }
+        }//end inner for loop
+      }//end outer for loop
+  }
   public int[][] getNewPuzzle(){
     return newPuzzle;
   }
@@ -82,7 +128,6 @@ public class HillClimbing
   //For finding the max of {rmax - r, r - rmin, cmax - c, c - cmin}
   public int getMaxLegalJump(int row, int col, int max)
   {
-
     int a = max - row;
     int b = row - 1;
     int c = max - col;
@@ -96,6 +141,14 @@ public class HillClimbing
         tempMax = tempArray[i];
     }
     return tempMax;
+  }
+
+  public int getRandomNonGoalCell(){
+    return randNonGoalCell;
+  }
+
+  public int getRandomNonGoalValue(){
+    return randNonGoalCellValue;
   }
 
   public int getXCell(int v, int n)
