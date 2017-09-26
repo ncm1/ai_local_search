@@ -1048,7 +1048,7 @@ public void populationApproach(){
 				for(int k =0; k < numMutations; ++k){
 				  if (rand.nextFloat() <= mutationProb){
 				     index = rand.nextInt(puzzTemp.candidate.length());
-				     tempMove = puzzTemp.getMaxLegalJump(index/n, index%n, n);
+				     tempMove = puzzTemp.getMaxLegalJump(index/n, index%n, n-1);
 				     randChar = (char) (96 + tempMove);
 				     if (index == puzzTemp.candidate.length())
 				       puzzTemp.candidate = puzzTemp.candidate.substring(0, index) + randChar;
