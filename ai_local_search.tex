@@ -581,6 +581,19 @@ IIMAGES
 
 \newpage
 \section{Simulated Annealing}
+\subsection{Parameters}
+When the temperature is higher, for a longer period of time the algorithm will allow downhill movement. So we maximize the temperature to allow for greater downhill movement to avoid local maxima.
+If the temperature was low (<200), then the algorithm wouldn't go downhill as much and the results would be subpar. As long as the temperature was moderate or high, and the decay factor is also high, then we would receive high results (in the 80-90 range for n =11 w/ 10k iterations).
+
+If the decay factor is too low, the temperature will reach 0 quickly.
+
+Based on experimentation we found that a low decay factor (<0.75) would lead to subpar results. 
+
+Maintaining a high, but not perfect decay factor is key in allowing the temperature to slowly decrease. (0.9 - 0.98).
+
+For the following simulations we used the values:
+Temperature = 1000
+Decay Ratio = 0.95
 
 \subsection{Example Puzzle for n = 5}
 
@@ -753,9 +766,14 @@ The algorithm was implemented with the help of a priority queue, to implement a 
 \subsection{Figures}
 For:
 
-mutation = 0.05
-initial population = 60
-time limit for iteration = 10000
+mutation probability = 0.05
+
+initial population:
+n = 5: 10
+n = 7: 20
+n = 9: 25
+n = 11: 40
+
 
 
 
@@ -784,16 +802,34 @@ time limit for iteration = 10000
 	\begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.40]{/Users/nathanmorgenstern/Desktop/aiImages/hillClimbingRestarts/hillClimbingRestartsPlot_50trials_size11.png}
-	\caption{Plot of 100,000 iterations averaged over 50 runs for n = 11}
-	\label{fig: Plot of 100,000 iterations averaged over 50 runs for n = 11}
+	\caption{Plot of iterations over 500ms of Computation Time averaged over 50 runs for n = 5}
+	\label{fig: Plot of 100,000 iterations averaged over 50 runs for n = 5}
 	\end{figure}
 
 \subsection{Example Puzzle for n = 7}
 
+	\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.40]{/Users/nathanmorgenstern/Desktop/aiImagesPopulationApproach/PopulationApproach_Plot_1.2s_size7.png}
+	\caption{Plot of iterations over 1200ms of Computation Time averaged over 50 runs for n = 7}
+	\label{fig: Plot of 100,000 iterations averaged over 50 runs for n = 11}
+	\end{figure}
 \subsection{Example Puzzle for n = 9}
 
+	\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.40]{/Users/nathanmorgenstern/Desktop/aiImages/PopulationApproach/PopulationApproach_Plot_2.5s_size9.png}
+	\caption{Plot of iterations over ms of Computation Time averaged over 50 runs for n = 9}
+	\label{fig: Plot of 100,000 iterations averaged over 50 runs for n = 11}
+	\end{figure}
 \subsection{Example Puzzle for n = 11}
 
+	\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.40]{/Users/nathanmorgenstern/Desktop/aiImages/PopulationApproach/PopulationApproach_Plot_5.0s_size11.png}
+	\caption{Plot of 100,000 iterations averaged over 50 runs for n = 11}
+	\label{fig: Plot of 100,000 iterations averaged over 50 runs for n = 11}
+	\end{figure}
 
 
 
