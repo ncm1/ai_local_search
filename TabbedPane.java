@@ -137,8 +137,8 @@ public JPanel populationApproachPuzzleMenu(){
   populationSizeBox.addActionListener(this);
   
 
-  pa50times = new JButton(generate_Icon);
-  pa50times.setBounds(10,10,150,44);
+  pa50times = new JButton();
+  pa50times.setBounds(5,5,50,50);
   pa50times.addActionListener(this);
   pane.add(pa50times);
 
@@ -216,8 +216,8 @@ public JPanel SimulatedAnnealingPuzzleMenu() {
   iterBox.addActionListener(this);
   initTempField.addActionListener(this);
   tempDecayRateField.addActionListener(this);
-  sa50times = new JButton(generate_Icon);
-  sa50times.setBounds(10,10,150,44);
+  sa50times = new JButton();
+  sa50times.setBounds(5,5,50,50);
   sa50times.addActionListener(this);
   pane.add(sa50times);
   //System.out.println("I'm here at least");

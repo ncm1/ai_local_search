@@ -127,16 +127,38 @@ public class HillClimbing
 
   //For finding the max of {rmax - r, r - rmin, cmax - c, c - cmin}
   public int getMaxLegalJump(int row, int col, int max)
-  {
+  { // (row, col, max-1)
     int a = max - row;
     int b = row - 1;
-    int c = max - col;
+    
+    int c = max - col; 
     int d = col - 1;
+    
+    //max - 1
+    //					x x x x x
+    //					x x x x x 	
+    // input: col = 3 	x x x o x
+    //					x x x x x
+    //					x x x x x
+    // 
+    //c = 4 - 3 = 1
+    //d = 3 - 1 = 2 
+    
+    // row+1 and col+1
+    //					x x x x x
+    //					x x x x x
+    //  input: col = 4 	x x x o x 
+    //					x x x x x
+    //					x x x x x
+    // a 
+    // 
+    //c = 5 - 4 = 1
+    // d = 4 - 1 = 3
 
     int[] tempArray = {b, c, d};
     int tempMax = a;
 
-    for(int i = 0; i < 3; i++){
+    for(int i = 0; i < 3; i++){ // 1 - (max-1) 
       if(tempMax < tempArray[i])
         tempMax = tempArray[i];
     }

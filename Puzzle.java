@@ -145,13 +145,13 @@ public class Puzzle{
       */
       Random randy = new Random();
       int row; int col;
-      row = randy.nextInt(n-1);
-      col = randy.nextInt(n-1);
+      row = randy.nextInt(n-1)+1;
+      col = randy.nextInt(n-1)+1;
       while ((row == n-1 && col == n-1) ){
         row = randy.nextInt(n-1);
         col = randy.nextInt(n-1);
       }
-      int jumpVal = randy.nextInt( getMaxLegalJump(row,col,n) ) + 1;
+      int jumpVal = randy.nextInt( getMaxLegalJump(row+1,col+1,n) ) + 1;
 
       puzzleArr[col][row] = jumpVal;
       generateDigraph(puzzleArr, n);
