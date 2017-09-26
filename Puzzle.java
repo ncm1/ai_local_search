@@ -12,7 +12,7 @@ public class Puzzle{
     private Graph g;
     private int evaluationOutput;
     int n ;
-    String candidate;
+    String candidate; // remember candidate length = n^2 - 1. We don't include the goal box
 
   public Puzzle(String cand){
 	  this.candidate = cand;
@@ -91,7 +91,7 @@ public class Puzzle{
 	  }
   	public void stringToPuzzle(int n){
   		puzzleArr = new int[n][n];
-  		for (int i = 0; i < candidate.length()-1; ++i){
+  		for (int i = 0; i < candidate.length(); ++i){
   			puzzleArr[i/n][i%n] = ((int)candidate.charAt(i)) - 96 ;	
   		}
   		puzzleArr[n-1][n-1] = 0;

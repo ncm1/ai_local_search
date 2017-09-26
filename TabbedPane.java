@@ -66,6 +66,7 @@ JButton hillClimbWalkGenerate;
 JButton simulatedAnnealingGenerate;
 JButton populationApproachGenerate;
 JButton sa50times;
+JButton pa50times;
 
 //Simulated Annealing
 //JTextField initTempField = new JTextField();
@@ -103,7 +104,7 @@ public JPanel populationApproachPuzzleMenu(){
   sizeBox.addItem(11);
   sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
 
-  for(int i = 20; i <= 5000; i+= 20)
+  for(int i = 20; i <= 10000; i+= 20)
     iterEndTimeBox.addItem(i);
   for(int j = 2; j <= 1000; j+= 2)
     populationSizeBox.addItem(j);
@@ -135,7 +136,11 @@ public JPanel populationApproachPuzzleMenu(){
   iterEndTimeBox.addActionListener(this);
   populationSizeBox.addActionListener(this);
   
-  //System.out.println("I'm here at least");
+
+  pa50times = new JButton(generate_Icon);
+  pa50times.setBounds(10,10,150,44);
+  pa50times.addActionListener(this);
+  pane.add(pa50times);
 
   //Add the title, prompt, sizebox, and generate icon to the interface
   pane.add(title);
@@ -191,7 +196,6 @@ public JPanel SimulatedAnnealingPuzzleMenu() {
   //Add generate icon as a button on the gui
   ImageIcon generate_Icon  = new ImageIcon("icons/generate.png");
   simulatedAnnealingGenerate = new JButton(generate_Icon);
-  sa50times = new JButton(generate_Icon);
   ImageIcon cancel_Icon = new ImageIcon("icons/back.png");
   cancel = new JButton(cancel_Icon);
 
@@ -212,7 +216,7 @@ public JPanel SimulatedAnnealingPuzzleMenu() {
   iterBox.addActionListener(this);
   initTempField.addActionListener(this);
   tempDecayRateField.addActionListener(this);
-  
+  sa50times = new JButton(generate_Icon);
   sa50times.setBounds(10,10,150,44);
   sa50times.addActionListener(this);
   pane.add(sa50times);
@@ -958,7 +962,6 @@ public void simulatedAnnealingApproach(){
         tabPane.setComponentAt(3,dataPane);
         //write to file
         writeEvaluationArrayToFile(FILENAME + "maxEvalSA9.txt", evalValueArray);
-
 }
 
 public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> evalValueArray){
@@ -977,10 +980,34 @@ public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> eval
         maxEvalFile.close();
 }	
 
+public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> evalValueArray,LinkedList<Long> timeArray){
+    PrintWriter maxEvalFile = null;
+    PrintWriter maxTimeFile = null;
+    try{
+      maxEvalFile = new PrintWriter(new FileWriter(filename, true));
+      maxTimeFile = new PrintWriter(new FileWriter(filename + "_time", true));
+    }catch (IOException i) {
+      // TODO Auto-generated catch block
+      i.printStackTrace();
+    }
+    int arrayMaxSize = evalValueArray.size();
+    for(int i =0; i < arrayMaxSize; i++){
+    	maxEvalFile.write(Integer.toString(evalValueArray.removeFirst()  ) + " ");
+    	maxTimeFile.write(Long.toString(timeArray.removeFirst() )  + " ");
+    }
+    
+    maxEvalFile.flush();
+    maxEvalFile.close();
+    maxTimeFile.flush();
+    maxTimeFile.close();
+}	
+
 public void populationApproach(){
 	/**
 	 * puzzVal refers to the evaluation function value
 	 */
+        LinkedList<Integer> evalValueArray = new LinkedList<Integer>();
+        LinkedList<Long> timeArray = new LinkedList<Long>();
         int n = (int)sizeBox.getSelectedItem();
         long iterEndTime = (int)iterEndTimeBox.getSelectedItem();
         int initialPop = (int)populationSizeBox.getSelectedItem();
@@ -993,43 +1020,56 @@ public void populationApproach(){
         Puzzle puzz;
         //iteration loop
         
-        popGenStartTime = System.currentTimeMillis();
+        
         Puzzle p1, p2, c1, c2; // parent 1 parent 2 child 1 child 2
-        PuzzleOppositeComparator comp = new PuzzleOppositeComparator();
-        PriorityQueue<Puzzle> q = new PriorityQueue<Puzzle>(11,comp);
-        PriorityQueue<Puzzle> qTemp = new PriorityQueue<Puzzle>(11,comp); 
+        PuzzleOppositeComparator comp = new PuzzleOppositeComparator(); // these probably take a long time
+        PriorityQueue<Puzzle> q = new PriorityQueue<Puzzle>(10000,comp);
+        PriorityQueue<Puzzle> qTemp = new PriorityQueue<Puzzle>(10000,comp); 
         Random rand = new Random();
         String a1, a2, b1, b2;
 
+        
         int numMutations;
         int index;
         char randChar;
         int tempMove;
+        int popSize = 0;
         Puzzle puzzTemp;
         Puzzle finalPuzzle;
+        int tempPopSize;
         int puzzTempEval;
+        int totalValueOfPop =  0;
+        
+        popGenStartTime = System.currentTimeMillis();
         puzz = new Puzzle(n,true);
         puzz.evaluationFunction(puzz.getGraph().bfs(0),puzz.n);
         q.add(puzz);
-        for (int i = 1; i < initialPop; ++i){ //initialize population
+        for (int i = 0; i < initialPop; ++i){ //initialize population
           puzz = new Puzzle(n,true);
           puzz.evaluationFunction(puzz.getGraph().bfs(0),n);
-          q.add(puzz);
+          //System.out.println(puzz.getEvaluationOutput());
+    	  totalValueOfPop += puzz.getEvaluationOutput();
+    	  q.add(puzz);
         }
-        elapsedTime = System.currentTimeMillis() - popGenStartTime;
+        popSize = initialPop;
         int iter = 0;
-        int startSize;
+        float avgPopVal; float temp;
+        elapsedTime = System.currentTimeMillis() - popGenStartTime;
+        //System.out.println("pop time: " + elapsedTime);
         do{
         	startTime = System.currentTimeMillis();
 	        numMutations = puzz.candidate.length();
 	        //crossover and mutation
-	        startSize = q.size();
-	        for (int i = 0; i < startSize; i=i+1){
+	        //System.out.println(startSize);
+	        tempPopSize = popSize;
+	        for (int i = 0; i < tempPopSize/2; i=i+1){
+	        	//System.out.println(popSize);
 	          //crossover
 		        p1 = q.poll();
 		        p2 = q.poll();
 	        	if ((p1!= null && p2!= null)){
 		          int crossOverPoint = rand.nextInt(p1.candidate.length());
+		          //System.out.println(crossOverPoint);
 		          a1 = p1.candidate.substring(0,crossOverPoint);
 		          a2 = p1.candidate.substring(crossOverPoint);
 		          b1 = p2.candidate.substring(0,crossOverPoint);
@@ -1037,53 +1077,113 @@ public void populationApproach(){
 		          c1 = new Puzzle(a1+b2);
 		          c2 = new Puzzle(b1+a2);
 	        	}
-	        	else
+	        	else{
 	        		break;
+	        	}
 	          //mutation
 	          for (int j = 0; j < 1; ++j){
-				if(j==0)
-				  puzzTemp = c1;
-				else
-				  puzzTemp = c2;
-				for(int k =0; k < numMutations; ++k){
-				  if (rand.nextFloat() <= mutationProb){
-				     index = rand.nextInt(puzzTemp.candidate.length());
-				     tempMove = puzzTemp.getMaxLegalJump(index/n, index%n, n-1);
-				     randChar = (char) (96 + tempMove);
-				     if (index == puzzTemp.candidate.length())
-				       puzzTemp.candidate = puzzTemp.candidate.substring(0, index) + randChar;
-				     else{
-				       puzzTemp.candidate = puzzTemp.candidate.substring(0, index) + randChar + puzzTemp.candidate.substring(index+1);
-				     }
-				  }
-				}
+      				if(j==0)
+      				  puzzTemp = c1;
+      				else
+      				  puzzTemp = c2;
+      				for(int k =0; k < numMutations; ++k){
+      				  if (rand.nextFloat() <= mutationProb){
+      				     index = rand.nextInt(puzzTemp.candidate.length());
+      				     tempMove = puzzTemp.getMaxLegalJump((index/n)+1, (index%n)+1, n);
+      				     randChar = (char) (96 + rand.nextInt(tempMove)+1 );
+      				     if (index == puzzTemp.candidate.length())
+      				       puzzTemp.candidate = puzzTemp.candidate.substring(0, index) + randChar;
+      				     else{
+      				       puzzTemp.candidate = puzzTemp.candidate.substring(0, index) + randChar + puzzTemp.candidate.substring(index+1);
+      				     }
+      				  }
+      				}
 	          }
+	          //long randomStuffTime = System.currentTimeMillis();
 	          c1.stringToPuzzle(n);
 	          c2.stringToPuzzle(n);
 	          c1.evaluationFunction(c1.getGraph().bfs(0),c1.n);
 	          c2.evaluationFunction(c2.getGraph().bfs(0),c2.n);
-	          qTemp.add(p1);
-	          qTemp.add(p2);
-	          qTemp.add(c1);
-	          qTemp.add(c2);
+	          /*
+	           * System.out.println("total value of pop " + totalValueOfPop);
+	           
+	          //System.out.println("p1 " + p1.getEvaluationOutput());
+	          //System.out.println("p2 " + p2.getEvaluationOutput());
+	          //System.out.println("c1 " + c1.getEvaluationOutput());
+	          //System.out.println("c2 " + c2.getEvaluationOutput());
+	           * */
+	          avgPopVal = totalValueOfPop;
+	          temp = popSize;
+	          if (p1.getEvaluationOutput() > 0){
+		          if (p1.getEvaluationOutput() >= avgPopVal/temp){
+			          qTemp.add(p1);
+		          }
+		          else{ 
+			          totalValueOfPop -= p1.getEvaluationOutput();
+			          --popSize;
+		          }
+	          }
+	          if (p2.getEvaluationOutput() > 0){
+		          if (p2.getEvaluationOutput() >=  avgPopVal/temp){
+			          qTemp.add(p2);
+		          }
+		          else {
+			          totalValueOfPop -= p2.getEvaluationOutput();
+			          --popSize;
+		          }
+	          }
+	          if (c1.getEvaluationOutput() > 0){
+		          if (c1.getEvaluationOutput() > ((float)(avgPopVal+ c1.getEvaluationOutput())) / ((float)(temp+1))){
+			          qTemp.add(c1);
+			          ++popSize;
+			          totalValueOfPop += c1.getEvaluationOutput();
+		          }
+	          }
+	          if (c2.getEvaluationOutput() > 0){
+		          if (c2.getEvaluationOutput() >  ((float) (avgPopVal + c2.getEvaluationOutput())) / ((float)(temp+1)) ){
+			          qTemp.add(c2);
+			          ++popSize;
+			          totalValueOfPop += c2.getEvaluationOutput();
+		          }
+	          }
+
+	          
+	          // totalValueOfPop = q total + qTemp total
 	        }
 	        //get the highest eval value
 			q = qTemp;
 			puzzTemp = q.peek();
-			puzzTempEval = puzzTemp.getEvaluationOutput(); // check these over time
+			if (puzzTemp == null){
+        		System.out.println("Population has died off :(");
+				System.out.println("population size: " + popSize);
+			}
+			//puzzTempEval = puzzTemp.getEvaluationOutput(); // check these over time
 			//System.out.println(puzzTempEval);
 			finalPuzzle = puzzTemp;
+			float timePerCan = (float) (System.currentTimeMillis() - startTime)/(popSize-tempPopSize);
+			
 			elapsedTime += System.currentTimeMillis() - startTime;
+			/*System.out.println("time per pop: " + timePerCan);
+			System.out.println("population: " + popSize);
+			System.out.println("elapsedTime: " + elapsedTime);
+			*/
+	        evalValueArray.add(q.peek().getEvaluationOutput());
+	        timeArray.add(elapsedTime);
 			if (elapsedTime >= iterEndTime){
 				break;
 			}
 			++iter;
         }while(iter < 10000000);
+        
+        tempPopSize = q.size();
         /*
-        for (int k = 0; k < q.size(); ++k){
+        for (int k = 0; k <tempPopSize; ++k){
         	System.out.println(q.poll().getEvaluationOutput());
         }
-        */
+        
+		System.out.println("average: " +  (float) totalValueOfPop/popSize);
+         * */
+        
         ButtonGrid finalPuzzleBG = new ButtonGrid(finalPuzzle.puzzleArr, n);
         tabPane.setComponentAt(1, finalPuzzleBG.getContentPane());
         puzzleMoves = new ButtonGrid(finalPuzzleBG.getGraph().bfs(0), n);
@@ -1091,6 +1191,7 @@ public void populationApproach(){
         dataPane = new DataPane(finalPuzzle.getEvaluationOutput(), iter);
         tabPane.setComponentAt(3,dataPane);
 
+        writeEvaluationArrayToFile(FILENAME + "maxEvalP11.txt", evalValueArray, timeArray);
 }
 
 /*
@@ -1128,6 +1229,11 @@ public void populationApproach(){
     }
     if(source == populationApproachGenerate){
       populationApproach();
+    }
+    if(source == pa50times){
+      for(int j = 0; j < 50; ++j){
+        populationApproach();
+      }
     }
     if(source == cancel){
         setVisible(false);
