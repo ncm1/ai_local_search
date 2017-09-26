@@ -104,7 +104,7 @@ public JPanel populationApproachPuzzleMenu(){
   iterEndTimeBox.setBounds(120, 300, 200, 100);
   populationSizePrompt.setBounds(450,40,250,200);
   populationSizeBox.setBounds(450,150,200,100);
-  
+
   JLabel mutationProbPrompt = new JLabel("Set the probability for mutation /100:");
   mutationProbPrompt.setBounds(450,190,250,200);
   mutationProbBox.setBounds(450,300,200,100);
@@ -118,7 +118,7 @@ public JPanel populationApproachPuzzleMenu(){
   sizeBox.addActionListener(this);
   iterEndTimeBox.addActionListener(this);
   populationSizeBox.addActionListener(this);
-  
+
 
   pa50times = new JButton();
   pa50times.setBounds(5,5,50,50);
@@ -157,7 +157,7 @@ public JPanel SimulatedAnnealingPuzzleMenu() {
   Font font = new Font("Cambria", Font.BOLD, 30);
   title.setFont(font);
 
-  
+
   sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
   sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   JLabel iterPrompt = new JLabel("Please select the number of iterations:");
@@ -311,7 +311,7 @@ public JPanel BasicHillClimbingPuzzleMenu() {
 
   setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
   pane.setLayout(null);
-  
+
   //Setting the Title and location
   JLabel title  = new JLabel("Basic Hill Climbing Main Menu");
   title.setBounds(150,50,600,100);
@@ -372,7 +372,7 @@ public JPanel HillClimbingRandomRestartsMenu(){
   title.setBounds(75,10,700,100);
   Font font = new Font("Cambria", Font.BOLD, 25);
   title.setFont(font);
-  
+
   sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
   sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   JLabel sizePrompt = new JLabel("Please select a size n");
@@ -439,7 +439,7 @@ public JPanel HillClimbingRandomWalkMenu(){
   title.setBounds(75,10,700,100);
   Font font = new Font("Cambria", Font.BOLD, 25);
   title.setFont(font);
-  
+
   sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
   sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   JLabel sizePrompt = new JLabel("Please select a size n");
@@ -582,14 +582,7 @@ public void userGeneratedApproach(){
 }
 
 public void basicHillApproach(){
-  /*
-    PrintWriter maxEvalFile = null;
-    try{
-      maxEvalFile = new PrintWriter(new FileWriter("./basicHillClimbingPuzzles/maxEval.txt", true));
-    }catch (IOException i) {
-    // TODO Auto-generated catch block
-    i.printStackTrace();
-  }*/
+
     long startTime = System.currentTimeMillis();
 
     int n    = (int)sizeBox.getSelectedItem();
@@ -599,6 +592,7 @@ public void basicHillApproach(){
     int[] visited = new int[sqr];
     bg = new ButtonGrid(n,n);
     Graph g = bg.getGraph();
+    //get the two dim array of moves from the bfs algo on the graph
     visited = g.bfs(0);
 
     puzzleMoves = new ButtonGrid(visited, n); //Call ButtonGrid constructor to create the puzzle moves pane
@@ -618,8 +612,7 @@ public void basicHillApproach(){
       //Generate the new directed graph and perform bfs
       bg.generateDigraph(hClimb.getNewPuzzle(), n);
       g = bg.getGraph();
-      //set visited to the set of puzzle moves and finally compare
-      //the evaluation output
+      //get the two dim array of moves from the bfs algo on the graph
       visited = g.bfs(0);
       //We need to get the new evaluation function output now, we can use
       //the method avaliable in the ButtonGrid class
@@ -632,13 +625,10 @@ public void basicHillApproach(){
         maxEvalOutput = currEvalOutput;
         hClimb.setbestPuzzleToNew(hClimb.getNewPuzzle());
         hClimb.setVisited(visited);
-        //bestPuzzleFile.createNewFile();
       }
       //Don't accept the change
       else
         hClimb.revertLastMove();
-
-      //maxEvalFile.println(maxEvalOutput);
     }//end for loop
 
     //Calculate the end time and the total time by subtracting end from start
@@ -654,19 +644,9 @@ public void basicHillApproach(){
 
     dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
     tabPane.setComponentAt(3,dataPane);
-    //maxEvalFile.close();
-
 }
 
 public void hillClimbingRandomRestartApproach(){
-
-  /*PrintWriter maxEvalFile = null;
-    try{
-      maxEvalFile = new PrintWriter(new FileWriter("./basicHillClimbingPuzzles/maxEval.txt", true));
-    }catch (IOException i) {
-    // TODO Auto-generated catch block
-    i.printStackTrace();
-  }*/
 
   long startTime = System.currentTimeMillis();
 
@@ -682,9 +662,9 @@ public void hillClimbingRandomRestartApproach(){
   Graph g = bg.getGraph();
   //visited array will represent the moves array
   int[] visited = new int[n*n];
+  //get the two dim array of moves from the bfs algo on the graph
   visited = g.bfs(0);
-  //set visited to the set of puzzle moves and finally compare
-  //the evaluation output
+
   //Call ButtonGrid constructor to create the puzzle moves pane
   puzzleMoves = new ButtonGrid(visited, n);
   //get the evalOutput for the first puzzle
@@ -704,8 +684,7 @@ public void hillClimbingRandomRestartApproach(){
       //Generate the new directed graph and perform bfs
       bg.generateDigraph(hClimb.getNewPuzzle(), n);
       g = bg.getGraph();
-      //set visited to the set of puzzle moves and finally compare
-      //the evaluation output
+      //get the two dim array of moves from the bfs algo on the graph
       visited = g.bfs(0);
       //We need to get the new evaluation function output now, we can use
       //the method avaliable in the ButtonGrid class
@@ -718,17 +697,12 @@ public void hillClimbingRandomRestartApproach(){
         maxEvalOutput = currEvalOutput;
         hClimb.setbestPuzzleToNew(hClimb.getNewPuzzle());
         hClimb.setVisited(visited);
-        //System.out.println(maxEvalOutput);
       }
       //Don't accept the change
       else
         hClimb.revertLastMove();
-      //maxEvalFile.println(maxEvalOutput);
     }//end iteration loop
     hClimb.randomResetNewPuzzle();
-    //System.out.println("Random reset puzzle: ");
-    //bg.printArr(hClimb.getNewPuzzle());
-    //maxEvalOutput = bg.getEvaluationOutput()
   }//end restart loop per hill climbing process
   //Calculate the end time and the total time by subtracting end from start
   long endTime = System.currentTimeMillis();
@@ -743,17 +717,9 @@ public void hillClimbingRandomRestartApproach(){
 
   dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
   tabPane.setComponentAt(3,dataPane);
-  //maxEvalFile.close();
 }
 
 public void hillClimbingRandomWalkApproach(){
-  /*PrintWriter maxEvalFile = null;
-    try{
-      maxEvalFile = new PrintWriter(new FileWriter("./basicHillClimbingPuzzles/maxEval.txt", true));
-    }catch (IOException i) {
-    // TODO Auto-generated catch block
-    i.printStackTrace();
-  }*/
 
   long startTime = System.currentTimeMillis();
 
@@ -796,8 +762,7 @@ public void hillClimbingRandomWalkApproach(){
     //Generate the new directed graph and perform bfs
     bg.generateDigraph(hClimb.getNewPuzzle(), n);
     g = bg.getGraph();
-    //set visited to the set of puzzle moves and finally compare
-    //the evaluation output
+    //get the two dim array of moves from the bfs algo on the graph
     visited = g.bfs(0);
     //We need to get the new evaluation function output now, we can use
     //the method avaliable in the ButtonGrid class
@@ -810,31 +775,16 @@ public void hillClimbingRandomWalkApproach(){
       maxEvalOutput = currEvalOutput;
       hClimb.setbestPuzzleToNew(hClimb.getNewPuzzle());
       hClimb.setVisited(visited);
-      //System.out.println(maxEvalOutput);
     }
     //Don't accept the change with probability q = 1 - p given by user
     else
     {
       result = randy.nextInt(max - min + 1) + min;
-      System.out.println("result: " + result);
-      System.out.println("userProb: " + userProb);
 
-      if(result > userProb){
+      if(result > userProb)
         hClimb.revertLastMove();
-        System.out.println("Reverting...");
-        reverted++;
-      }
-      else
-        System.out.println("Not reverting...");
     }
-      //maxEvalFile.println(maxEvalOutput);
   }//end iteration loop
-  System.out.println("Reverted: " + reverted);
-  System.out.println("Didn't revert: " + (iter - reverted));
-
-    //System.out.println("Random reset puzzle: ");
-    //bg.printArr(hClimb.getNewPuzzle());
-    //maxEvalOutput = bg.getEvaluationOutput()
   //Calculate the end time and the total time by subtracting end from start
   long endTime = System.currentTimeMillis();
   long evaluationTime = endTime - startTime;
@@ -848,7 +798,6 @@ public void hillClimbingRandomWalkApproach(){
 
   dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
   tabPane.setComponentAt(3,dataPane);
-  //maxEvalFile.close();
 }
 
 public void simulatedAnnealingApproach(){
@@ -867,7 +816,7 @@ public void simulatedAnnealingApproach(){
         int val;
         int prevVal;
         Puzzle finalPuzzle;
-        
+
         finalPuzzle = new Puzzle(n,n);
         finalPuzzle.evaluationFunction(finalPuzzle.getGraph().bfs(0), n);
         prevVal = finalPuzzle.getEvaluationOutput();
@@ -876,7 +825,7 @@ public void simulatedAnnealingApproach(){
         evalValueArray.add(prevVal);
         for (int i = 0; i < iter-1; ++i){
           temp = temp * decayRate;
-          
+
           //System.out.println("temp:" + temp);
           changedPuz = new Puzzle(finalPuzzle.puzzleArr, n);
           changedPuz.randCellChange();
@@ -891,7 +840,7 @@ public void simulatedAnnealingApproach(){
         	  //System.out.println("Val" + val);
         	  //System.out.println( Math.exp((double)(val - prevVal )/temp) );
         	  if (randy.nextFloat() < Math.exp((double)(val - prevVal )/temp)){ //  probability condition met
-            	
+
 	              prevVal = val;
 	              finalPuzzle = changedPuz;
         	  }
@@ -936,7 +885,7 @@ public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> eval
         }
         maxEvalFile.flush();
         maxEvalFile.close();
-}	
+}
 
 public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> evalValueArray,LinkedList<Long> timeArray){
     PrintWriter maxEvalFile = null;
@@ -953,12 +902,12 @@ public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> eval
     	maxEvalFile.write(Integer.toString(evalValueArray.removeFirst()  ) + " ");
     	maxTimeFile.write(Long.toString(timeArray.removeFirst() )  + " ");
     }
-    
+
     maxEvalFile.flush();
     maxEvalFile.close();
     maxTimeFile.flush();
     maxTimeFile.close();
-}	
+}
 
 public void populationApproach(){
 	/**
@@ -977,16 +926,16 @@ public void populationApproach(){
         Random randy = new Random();
         Puzzle puzz;
         //iteration loop
-        
-        
+
+
         Puzzle p1, p2, c1, c2; // parent 1 parent 2 child 1 child 2
         PuzzleOppositeComparator comp = new PuzzleOppositeComparator(); // these probably take a long time
         PriorityQueue<Puzzle> q = new PriorityQueue<Puzzle>(10000,comp);
-        PriorityQueue<Puzzle> qTemp = new PriorityQueue<Puzzle>(10000,comp); 
+        PriorityQueue<Puzzle> qTemp = new PriorityQueue<Puzzle>(10000,comp);
         Random rand = new Random();
         String a1, a2, b1, b2;
 
-        
+
         int numMutations;
         int index;
         char randChar;
@@ -997,7 +946,7 @@ public void populationApproach(){
         int tempPopSize;
         int puzzTempEval;
         int totalValueOfPop =  0;
-        
+
         popGenStartTime = System.currentTimeMillis();
         puzz = new Puzzle(n,true);
         puzz.evaluationFunction(puzz.getGraph().bfs(0),puzz.n);
@@ -1064,7 +1013,7 @@ public void populationApproach(){
 	          c2.evaluationFunction(c2.getGraph().bfs(0),c2.n);
 	          /*
 	           * System.out.println("total value of pop " + totalValueOfPop);
-	           
+
 	          //System.out.println("p1 " + p1.getEvaluationOutput());
 	          //System.out.println("p2 " + p2.getEvaluationOutput());
 	          //System.out.println("c1 " + c1.getEvaluationOutput());
@@ -1076,7 +1025,7 @@ public void populationApproach(){
 		          if (p1.getEvaluationOutput() >= avgPopVal/temp){
 			          qTemp.add(p1);
 		          }
-		          else{ 
+		          else{
 			          totalValueOfPop -= p1.getEvaluationOutput();
 			          --popSize;
 		          }
@@ -1105,7 +1054,7 @@ public void populationApproach(){
 		          }
 	          }
 
-	          
+
 	          // totalValueOfPop = q total + qTemp total
 	        }
 	        //get the highest eval value
@@ -1119,7 +1068,7 @@ public void populationApproach(){
 			//System.out.println(puzzTempEval);
 			finalPuzzle = puzzTemp;
 			float timePerCan = (float) (System.currentTimeMillis() - startTime)/(popSize-tempPopSize);
-			
+
 			elapsedTime += System.currentTimeMillis() - startTime;
 			/*System.out.println("time per pop: " + timePerCan);
 			System.out.println("population: " + popSize);
@@ -1132,16 +1081,16 @@ public void populationApproach(){
 			}
 			++iter;
         }while(iter < 10000000);
-        
+
         tempPopSize = q.size();
         /*
         for (int k = 0; k <tempPopSize; ++k){
         	System.out.println(q.poll().getEvaluationOutput());
         }
-        
+
 		System.out.println("average: " +  (float) totalValueOfPop/popSize);
          * */
-        
+
         ButtonGrid finalPuzzleBG = new ButtonGrid(finalPuzzle.puzzleArr, n);
         tabPane.setComponentAt(1, finalPuzzleBG.getContentPane());
         puzzleMoves = new ButtonGrid(finalPuzzleBG.getGraph().bfs(0), n);
