@@ -959,13 +959,14 @@ public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> eval
     maxTimeFile.flush();
     maxTimeFile.close();
 }	
-
+int experimentNum = 0;
+LinkedList<EvalAndTime>[] outputArray = new LinkedList[50];
 public void populationApproach(){
 	/**
 	 * puzzVal refers to the evaluation function value
 	 */
-        LinkedList<Integer> evalValueArray = new LinkedList<Integer>();
-        LinkedList<Long> timeArray = new LinkedList<Long>();
+        //LinkedList<Integer> evalValueArray = new LinkedList<Integer>();
+        //LinkedList<Long> timeArray = new LinkedList<Long>();
         int n = (int)sizeBox.getSelectedItem();
         long iterEndTime = (int)iterEndTimeBox.getSelectedItem();
         int initialPop = (int)populationSizeBox.getSelectedItem();
@@ -1012,6 +1013,7 @@ public void populationApproach(){
         popSize = initialPop;
         int iter = 0;
         float avgPopVal; float temp;
+		outputArray[experimentNum] = new LinkedList<EvalAndTime>();
         elapsedTime = System.currentTimeMillis() - popGenStartTime;
         //System.out.println("pop time: " + elapsedTime);
         do{
@@ -1125,8 +1127,12 @@ public void populationApproach(){
 			System.out.println("population: " + popSize);
 			System.out.println("elapsedTime: " + elapsedTime);
 			*/
-	        evalValueArray.add(q.peek().getEvaluationOutput());
-	        timeArray.add(elapsedTime);
+			EvalAndTime obj = new EvalAndTime();
+	        obj.eval = q.peek().getEvaluationOutput();
+	        obj.time = elapsedTime;
+	        //System.out.println(experimentNum);
+	        outputArray[experimentNum].add(obj);
+	        //evalValueArray.add();
 			if (elapsedTime >= iterEndTime){
 				break;
 			}
@@ -1148,7 +1154,11 @@ public void populationApproach(){
         tabPane.setComponentAt(2,puzzleMoves.getContentPane());
         dataPane = new DataPane(finalPuzzle.getEvaluationOutput(), iter);
         tabPane.setComponentAt(3,dataPane);
-        writeEvaluationArrayToFile(FILENAME + "maxEvalPA"+ n + ".txt", evalValueArray, timeArray);
+        if (experimentNum == 49){
+        	TimeEvalOutput res = EvalAndTime.sortEvalAndTimeByTime(outputArray);
+        	writeEvaluationArrayToFile(FILENAME + "maxEvalPA"+ n + ".txt", res.evalLL, res.timeLL);
+        }
+        	
 }
 
 /*
@@ -1185,11 +1195,14 @@ public void populationApproach(){
     	}
     }
     if(source == populationApproachGenerate){
+    	experimentNum = 0;
       populationApproach();
     }
     if(source == pa50times){
+    	experimentNum = 0;
       for(int j = 0; j < 50; ++j){
         populationApproach();
+        ++experimentNum;
       }
     }
     if(source == cancel){
