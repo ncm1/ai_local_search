@@ -48,6 +48,8 @@ public class TabbedPane extends JFrame implements ActionListener
 
 //This will be used for basic puzzle menu, basic hill climbing,
 JComboBox sizeBox = new JComboBox();
+  sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
+  sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
 JButton   cancel;
 //Basic user menu will contain a combobox as well as a generate button
 JButton   basicGenerate;
@@ -61,16 +63,9 @@ JButton basicHillGenerate;
 //Hill Climbing with random restarts needs number of restarts
 JComboBox restartBox = new JComboBox();
 JComboBox probabilityBox = new JComboBox();
-JButton hillClimbRestartsGenerate;
-JButton hillClimbWalkGenerate;
-JButton simulatedAnnealingGenerate;
-JButton populationApproachGenerate;
-JButton sa50times;
-JButton pa50times;
+JButton hillClimbRestartsGenerate, hillClimbWalkGenerate;
+JButton simulatedAnnealingGenerate, populationApproachGenerate, sa50times, pa50times;
 
-//Simulated Annealing
-//JTextField initTempField = new JTextField();
-//JTextField tempDecayRateField = new JTextField();
 JComboBox initTempField = new JComboBox();
 JComboBox tempDecayRateField = new JComboBox();
 
@@ -78,11 +73,6 @@ JComboBox tempDecayRateField = new JComboBox();
 JComboBox iterEndTimeBox = new JComboBox();
 JComboBox populationSizeBox = new JComboBox();
 JComboBox mutationProbBox = new JComboBox();
-/*
-public JPanel PopulationPuzzleMenu(){
-
-}
-*/
 
 public JPanel populationApproachPuzzleMenu(){
   JPanel pane = new JPanel();
@@ -97,12 +87,6 @@ public JPanel populationApproachPuzzleMenu(){
   JLabel sizePrompt = new JLabel("Size:");
   JLabel iterEndTimePrompt = new JLabel("Set time limit to iterate over: ");
   JLabel populationSizePrompt = new JLabel("Set the initial population size: ");
-  
-  sizeBox.addItem(5);
-  sizeBox.addItem(7);
-  sizeBox.addItem(9);
-  sizeBox.addItem(11);
-  sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
 
   for(int i = 20; i <= 10000; i+= 20)
     iterEndTimeBox.addItem(i);
@@ -178,12 +162,6 @@ public JPanel SimulatedAnnealingPuzzleMenu() {
   JLabel initTempPrompt = new JLabel("Please select the initial temperature: ");
   JLabel tempDecayRatePrompt = new JLabel("Please select the decay rate: ");
   JLabel sizePrompt = new JLabel("Size:");
-  sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
-  //Populate the sizebox with the possible puzzle sizes
-  sizeBox.addItem(5);
-  sizeBox.addItem(7);
-  sizeBox.addItem(9);
-  sizeBox.addItem(11);
 
   for(int i = 250; i <= 100000; i+= 250)
     iterBox.addItem(i);
@@ -258,14 +236,6 @@ public JPanel BasicPuzzleMenu() {
   title.setFont(font);
   Font font1 = new Font("Cambria", Font.BOLD, 20);
   prompt.setFont(font1);
-
-  //Setting the default text to display
-  sizeBox.setPrototypeDisplayValue("Size");
-  //Populate the sizebox with the possible puzzle sizes
-  sizeBox.addItem(5);
-  sizeBox.addItem(7);
-  sizeBox.addItem(9);
-  sizeBox.addItem(11);
 
   //Add generate icon as a button on the gui
   ImageIcon generate_Icon  = new ImageIcon("icons/generate.png");
@@ -347,13 +317,6 @@ public JPanel BasicHillClimbingPuzzleMenu() {
   JLabel sizePrompt = new JLabel("Please select a size n");
   JLabel iterPrompt = new JLabel("Please select the number of iterations:");
 
-  //Setting the default text to display
-  sizeBox.setPrototypeDisplayValue("Size");
-  //Populate the sizebox with the possible puzzle sizes
-  sizeBox.addItem(5);
-  sizeBox.addItem(7);
-  sizeBox.addItem(9);
-  sizeBox.addItem(11);
 
   for(int i = 1000; i <= 100000; i+= 250)
     iterBox.addItem(i);
@@ -408,14 +371,6 @@ public JPanel HillClimbingRandomRestartsMenu(){
   JLabel sizePrompt = new JLabel("Please select a size n");
   JLabel iterPrompt = new JLabel("Please select the number of iterations per process:");
   JLabel restartPrompt = new JLabel("Please select the number of restarts");
-
-  //Setting the default text to display
-  sizeBox.setPrototypeDisplayValue("Size");
-  //Populate the sizebox with the possible puzzle sizes
-  sizeBox.addItem(5);
-  sizeBox.addItem(7);
-  sizeBox.addItem(9);
-  sizeBox.addItem(11);
 
   for(int i = 10; i <= 10000; i+= 10)
     iterBox.addItem(i);
@@ -482,13 +437,6 @@ public JPanel HillClimbingRandomWalkMenu(){
   JLabel iterPrompt = new JLabel("Please select the number of iterations per process:");
   JLabel probabilityPrompt = new JLabel("Please select the probability of restart");
 
-  //Setting the default text to display
-  sizeBox.setPrototypeDisplayValue("Size");
-  //Populate the sizebox with the possible puzzle sizes
-  sizeBox.addItem(5);
-  sizeBox.addItem(7);
-  sizeBox.addItem(9);
-  sizeBox.addItem(11);
 
   for(int i = 1000; i <= 100000; i+= 250)
     iterBox.addItem(i);
@@ -917,7 +865,7 @@ public void simulatedAnnealingApproach(){
         Puzzle changedPuz;
         //iteration loop
         evalValueArray.add(prevVal);
-        for (int i = 0; i < iter; ++i){
+        for (int i = 0; i < iter-1; ++i){
           temp = temp * decayRate;
           
           //System.out.println("temp:" + temp);
@@ -961,7 +909,7 @@ public void simulatedAnnealingApproach(){
         dataPane = new DataPane(bg.getEvaluationOutput(), evaluationTime);
         tabPane.setComponentAt(3,dataPane);
         //write to file
-        writeEvaluationArrayToFile(FILENAME + "maxEvalSA9.txt", evalValueArray);
+        writeEvaluationArrayToFile(FILENAME + "maxEvalSA" + n + ".txt", evalValueArray);
 }
 
 public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> evalValueArray){
@@ -973,6 +921,7 @@ public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> eval
           i.printStackTrace();
         }
         int arrayMaxSize = evalValueArray.size();
+        //System.out.println(arrayMaxSize);
         for(int i =0; i < arrayMaxSize; i++){
         	maxEvalFile.write(Integer.toString(evalValueArray.removeFirst() ) + " "  );
         }
@@ -1190,8 +1139,7 @@ public void populationApproach(){
         tabPane.setComponentAt(2,puzzleMoves.getContentPane());
         dataPane = new DataPane(finalPuzzle.getEvaluationOutput(), iter);
         tabPane.setComponentAt(3,dataPane);
-
-        writeEvaluationArrayToFile(FILENAME + "maxEvalP11.txt", evalValueArray, timeArray);
+        writeEvaluationArrayToFile(FILENAME + "maxEvalPA"+ n + ".txt", evalValueArray, timeArray);
 }
 
 /*
