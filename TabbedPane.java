@@ -444,13 +444,12 @@ public JPanel HillClimbingRandomWalkMenu(){
   sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   JLabel sizePrompt = new JLabel("Please select a size n");
   JLabel iterPrompt = new JLabel("Please select the number of iterations per process:");
-  JLabel probabilityPrompt = new JLabel("Please select the probability of restart");
+  JLabel probabilityPrompt = new JLabel("Probability of downhill acceptance");
 
 
   for(int i = 1000; i <= 100000; i+= 250)
     iterBox.addItem(i);
 
-  //DecimalFormat df = new DecimalFormat("#.00");
   for(int j = 0; j <= 100; j+= 1)
     probabilityBox.addItem(j);
 
@@ -1148,4 +1147,4 @@ public void populationApproach(){
 
   }//end action listener here
 
-}
+}//end of TabbedPane.java
