@@ -48,8 +48,6 @@ public class TabbedPane extends JFrame implements ActionListener
 
 //This will be used for basic puzzle menu, basic hill climbing,
 JComboBox sizeBox = new JComboBox();
-  sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
-  sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
 JButton   cancel;
 //Basic user menu will contain a combobox as well as a generate button
 JButton   basicGenerate;
@@ -83,7 +81,8 @@ public JPanel populationApproachPuzzleMenu(){
   title.setBounds(150,50,600,100);
   Font font = new Font("Cambria", Font.BOLD, 30);
   title.setFont(font);
-
+  sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
+  sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   JLabel sizePrompt = new JLabel("Size:");
   JLabel iterEndTimePrompt = new JLabel("Set time limit to iterate over: ");
   JLabel populationSizePrompt = new JLabel("Set the initial population size: ");
@@ -158,6 +157,9 @@ public JPanel SimulatedAnnealingPuzzleMenu() {
   Font font = new Font("Cambria", Font.BOLD, 30);
   title.setFont(font);
 
+  
+  sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
+  sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   JLabel iterPrompt = new JLabel("Please select the number of iterations:");
   JLabel initTempPrompt = new JLabel("Please select the initial temperature: ");
   JLabel tempDecayRatePrompt = new JLabel("Please select the decay rate: ");
@@ -231,7 +233,8 @@ public JPanel BasicPuzzleMenu() {
   JLabel title = new JLabel("Basic Puzzle Generator Main Menu");
   JLabel prompt = new JLabel("Please select the size of n:");
   title.setBounds(110,50,600,100);
-
+  sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
+  sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   Font font = new Font("Cambria", Font.BOLD, 30);
   title.setFont(font);
   Font font1 = new Font("Cambria", Font.BOLD, 20);
@@ -268,7 +271,8 @@ public JPanel UserPuzzleMenu() {
 
   setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
   pane.setLayout(null);
-
+  sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
+  sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   //Setting the Title and location
   JLabel title = new JLabel("User Generated Puzzle Main Menu");
   title.setBounds(110,50,600,100);
@@ -307,13 +311,14 @@ public JPanel BasicHillClimbingPuzzleMenu() {
 
   setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
   pane.setLayout(null);
-
+  
   //Setting the Title and location
   JLabel title  = new JLabel("Basic Hill Climbing Main Menu");
   title.setBounds(150,50,600,100);
   Font font = new Font("Cambria", Font.BOLD, 30);
   title.setFont(font);
-
+  sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
+  sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   JLabel sizePrompt = new JLabel("Please select a size n");
   JLabel iterPrompt = new JLabel("Please select the number of iterations:");
 
@@ -367,7 +372,9 @@ public JPanel HillClimbingRandomRestartsMenu(){
   title.setBounds(75,10,700,100);
   Font font = new Font("Cambria", Font.BOLD, 25);
   title.setFont(font);
-
+  
+  sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
+  sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   JLabel sizePrompt = new JLabel("Please select a size n");
   JLabel iterPrompt = new JLabel("Please select the number of iterations per process:");
   JLabel restartPrompt = new JLabel("Please select the number of restarts");
@@ -432,7 +439,9 @@ public JPanel HillClimbingRandomWalkMenu(){
   title.setBounds(75,10,700,100);
   Font font = new Font("Cambria", Font.BOLD, 25);
   title.setFont(font);
-
+  
+  sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
+  sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   JLabel sizePrompt = new JLabel("Please select a size n");
   JLabel iterPrompt = new JLabel("Please select the number of iterations per process:");
   JLabel probabilityPrompt = new JLabel("Please select the probability of restart");
