@@ -158,7 +158,7 @@ public JPanel SimulatedAnnealingPuzzleMenu() {
   title.setFont(font);
 
 
-  sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
+  sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);sizeBox.addItem(50);
   sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   JLabel iterPrompt = new JLabel("Please select the number of iterations:");
   JLabel initTempPrompt = new JLabel("Please select the initial temperature: ");
@@ -591,8 +591,6 @@ public void basicHillApproach(){
     int n    = (int)sizeBox.getSelectedItem();
     int iter = (int)iterBox.getSelectedItem();
 
-    for(int i = 0; i < 50; i++){
-
     int sqr = n*n;
     int[] visited = new int[sqr];
     bg = new ButtonGrid(n,n);
@@ -609,6 +607,7 @@ public void basicHillApproach(){
     HillClimbing hClimb = new HillClimbing(bg.getPuzzleArr(), n);
     hClimb.setVisited(visited);
 
+    for(int i = 0; i < 50; i++){
     for(int iterations = 0; iterations < iter; iterations++)
     {
       //Method hillClimb chooses a random non goal cell and then replaces
@@ -636,22 +635,31 @@ public void basicHillApproach(){
         hClimb.revertLastMove();
     }//end for loop
 
-    //Calculate the end time and the total time by subtracting end from start
-    long endTime = System.currentTimeMillis();
-    long evaluationTime = endTime - startTime;
+    //Calculate the end time and the total time by subtracting end from star
 
-    bg = new ButtonGrid(hClimb.getbestPuzzle(), n);
-    tabPane.setComponentAt(1, bg.getContentPane());
+    //bg = new ButtonGrid(hClimb.getbestPuzzle(), n);
+    //tabPane.setComponentAt(1, bg.getContentPane());
 
     visited = hClimb.getVisited();
     puzzleMoves = new ButtonGrid(visited,n);
-    tabPane.setComponentAt(2,puzzleMoves.getContentPane());
+    //tabPane.setComponentAt(2,puzzleMoves.getContentPane());
 
-    dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
-    tabPane.setComponentAt(3,dataPane);
+    //dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
+    //tabPane.setComponentAt(3,dataPane);
 
     writeEvaluationArrayToFile("TrainingPuzzles.txt", hClimb.getbestPuzzle(), puzzleMoves.getEvaluationOutput());
   }
+  long endTime = System.currentTimeMillis();
+  long evaluationTime = endTime - startTime;
+  bg = new ButtonGrid(hClimb.getbestPuzzle(), n);
+  tabPane.setComponentAt(1, bg.getContentPane());
+
+  visited = hClimb.getVisited();
+  puzzleMoves = new ButtonGrid(visited,n);
+  tabPane.setComponentAt(2,puzzleMoves.getContentPane());
+
+  dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
+  tabPane.setComponentAt(3,dataPane);
 }
 
 public void hillClimbingRandomRestartApproach(){
@@ -661,6 +669,8 @@ public void hillClimbingRandomRestartApproach(){
   int n    = (int)sizeBox.getSelectedItem();
   int iter = (int)iterBox.getSelectedItem();
   int restarts = (int)restartBox.getSelectedItem();
+
+
   int currEvalOutput;
   int maxEvalOutput;
 
@@ -684,6 +694,7 @@ public void hillClimbingRandomRestartApproach(){
   HillClimbing hClimb = new HillClimbing(bg.getPuzzleArr(), n);
   hClimb.setVisited(visited);
 
+  for(int x = 0; x < 50; x++){
   for(int i = 0; i < restarts; i++)
   {
     for(int j = 0; j < iter; j++)
@@ -713,10 +724,11 @@ public void hillClimbingRandomRestartApproach(){
     hClimb.randomResetNewPuzzle();
   }//end restart loop per hill climbing process
   //Calculate the end time and the total time by subtracting end from start
-  long endTime = System.currentTimeMillis();
-  long evaluationTime = endTime - startTime;
 
   writeEvaluationArrayToFile("TrainingPuzzles.txt", hClimb.getbestPuzzle(),puzzleMoves.getEvaluationOutput());
+  }
+  long endTime = System.currentTimeMillis();
+  long evaluationTime = endTime - startTime;
   bg = new ButtonGrid(hClimb.getbestPuzzle(), n);
   tabPane.setComponentAt(1, bg.getContentPane());
 
@@ -725,6 +737,7 @@ public void hillClimbingRandomRestartApproach(){
   tabPane.setComponentAt(2,puzzleMoves.getContentPane());
 
   dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
+
   tabPane.setComponentAt(3,dataPane);
 }
 
