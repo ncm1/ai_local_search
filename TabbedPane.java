@@ -912,7 +912,7 @@ public void writeEvaluationArrayToFile(String filename, int[][] evalValueArray, 
         	 maxEvalFile.write(Integer.toString(evalValueArray[i][j]) +",");
          }
           maxEvalFile.write("\n");
-        }ß
+        }
         maxEvalFile.write(Integer.toString(evaluationOutput));
         maxEvalFile.write("\n");
 
