@@ -234,6 +234,7 @@ public JPanel BasicPuzzleMenu() {
   JLabel prompt = new JLabel("Please select the size of n:");
   title.setBounds(110,50,600,100);
   sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
+  sizeBox.addItem(50);
   sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   Font font = new Font("Cambria", Font.BOLD, 30);
   title.setFont(font);
@@ -318,6 +319,7 @@ public JPanel BasicHillClimbingPuzzleMenu() {
   Font font = new Font("Cambria", Font.BOLD, 30);
   title.setFont(font);
   sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
+  sizeBox.addItem(50);
   sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   JLabel sizePrompt = new JLabel("Please select a size n");
   JLabel iterPrompt = new JLabel("Please select the number of iterations:");
@@ -374,14 +376,15 @@ public JPanel HillClimbingRandomRestartsMenu(){
   title.setFont(font);
 
   sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
+  sizeBox.addItem(50);
   sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   JLabel sizePrompt = new JLabel("Please select a size n");
   JLabel iterPrompt = new JLabel("Please select the number of iterations per process:");
   JLabel restartPrompt = new JLabel("Please select the number of restarts");
 
-  for(int i = 10; i <= 10000; i+= 10)
+  for(int i = 10; i <= 1000000; i+= 10)
     iterBox.addItem(i);
-  for(int j = 10; j <= 100000; j+= 10)
+  for(int j = 10; j <= 1000000; j+= 10)
     restartBox.addItem(j);
 
   //Add generate icon as a button on the gui
@@ -441,13 +444,14 @@ public JPanel HillClimbingRandomWalkMenu(){
   title.setFont(font);
 
   sizeBox.addItem(5);sizeBox.addItem(7);sizeBox.addItem(9);sizeBox.addItem(11);
+  sizeBox.addItem(50);
   sizeBox.setPrototypeDisplayValue("Size"); //Setting the default text to display
   JLabel sizePrompt = new JLabel("Please select a size n");
   JLabel iterPrompt = new JLabel("Please select the number of iterations per process:");
   JLabel probabilityPrompt = new JLabel("Probability of downhill acceptance");
 
 
-  for(int i = 1000; i <= 100000; i+= 250)
+  for(int i = 1000; i <= 10000000; i+= 250)
     iterBox.addItem(i);
 
   for(int j = 0; j <= 100; j+= 1)
@@ -587,6 +591,8 @@ public void basicHillApproach(){
     int n    = (int)sizeBox.getSelectedItem();
     int iter = (int)iterBox.getSelectedItem();
 
+    for(int i = 0; i < 50; i++){
+
     int sqr = n*n;
     int[] visited = new int[sqr];
     bg = new ButtonGrid(n,n);
@@ -643,6 +649,9 @@ public void basicHillApproach(){
 
     dataPane = new DataPane(puzzleMoves.getEvaluationOutput(), evaluationTime);
     tabPane.setComponentAt(3,dataPane);
+
+    writeEvaluationArrayToFile("TrainingPuzzles.txt", hClimb.getbestPuzzle(), puzzleMoves.getEvaluationOutput());
+  }
 }
 
 public void hillClimbingRandomRestartApproach(){
@@ -707,6 +716,7 @@ public void hillClimbingRandomRestartApproach(){
   long endTime = System.currentTimeMillis();
   long evaluationTime = endTime - startTime;
 
+  writeEvaluationArrayToFile("TrainingPuzzles.txt", hClimb.getbestPuzzle(),puzzleMoves.getEvaluationOutput());
   bg = new ButtonGrid(hClimb.getbestPuzzle(), n);
   tabPane.setComponentAt(1, bg.getContentPane());
 
@@ -886,6 +896,31 @@ public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> eval
         maxEvalFile.close();
 }
 
+public void writeEvaluationArrayToFile(String filename, int[][] evalValueArray, int evaluationOutput){
+        PrintWriter maxEvalFile = null;
+        try{
+          maxEvalFile = new PrintWriter(new FileWriter(filename, true));
+        }catch (IOException i) {
+          // TODO Auto-generated catch block
+          i.printStackTrace();
+        }
+        int arrayMaxSize = evalValueArray[0].length;
+        //System.out.println(arrayMaxSize);
+        for(int i =0; i < arrayMaxSize; i++)
+        {
+          for(int j = 0; j < arrayMaxSize; j++){
+        	 maxEvalFile.write(Integer.toString(evalValueArray[i][j]) +",");
+           System.out.println(evalValueArray[i][j]);
+         }
+          maxEvalFile.write("\n");
+        }
+        System.out.println(evaluationOutput);
+        maxEvalFile.write(Integer.toString(evaluationOutput));
+        maxEvalFile.write("\n");
+
+        maxEvalFile.close();
+}
+
 public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> evalValueArray,LinkedList<Long> timeArray){
     PrintWriter maxEvalFile = null;
     PrintWriter maxTimeFile = null;
@@ -906,9 +941,10 @@ public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> eval
     maxEvalFile.close();
     maxTimeFile.flush();
     maxTimeFile.close();
-}	
+}
 int experimentNum = 0;
 LinkedList<EvalAndTime>[] outputArray = new LinkedList[50];
+
 public void populationApproach(){
 	/**
 	 * puzzVal refers to the evaluation function value
@@ -1106,7 +1142,7 @@ public void populationApproach(){
         	TimeEvalOutput res = EvalAndTime.sortEvalAndTimeByTime(outputArray);
         	writeEvaluationArrayToFile(FILENAME + "maxEvalPA"+ n + ".txt", res.evalLL, res.timeLL);
         }
-        	
+
 }
 
 /*
