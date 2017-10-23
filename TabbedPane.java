@@ -910,11 +910,9 @@ public void writeEvaluationArrayToFile(String filename, int[][] evalValueArray, 
         {
           for(int j = 0; j < arrayMaxSize; j++){
         	 maxEvalFile.write(Integer.toString(evalValueArray[i][j]) +",");
-           System.out.println(evalValueArray[i][j]);
          }
           maxEvalFile.write("\n");
-        }
-        System.out.println(evaluationOutput);
+        }ß
         maxEvalFile.write(Integer.toString(evaluationOutput));
         maxEvalFile.write("\n");
 
