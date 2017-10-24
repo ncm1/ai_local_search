@@ -889,7 +889,8 @@ public void simulatedAnnealingApproach(){
         dataPane = new DataPane(bg.getEvaluationOutput(), evaluationTime);
         tabPane.setComponentAt(3,dataPane);
         //write to file
-        writeEvaluationArrayToFile(FILENAME + "maxEvalSA" + n + ".txt", evalValueArray);
+        writeEvaluationArrayToFile("TrainingPuzzlesSimulated.txt", finalPuzzle.puzzleArr, bg.getEvaluationOutput());
+        //writeEvaluationArrayToFile(FILENAME + "maxEvalSA" + n + ".txt", evalValueArray);
 }
 
 public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> evalValueArray){
@@ -923,17 +924,37 @@ public void writeEvaluationArrayToFile(String filename, int[][] evalValueArray, 
         {
           for(int j = 0; j < arrayMaxSize; j++){
         	 maxEvalFile.write(Integer.toString(evalValueArray[i][j]) +",");
-           System.out.println(evalValueArray[i][j]);
          }
           maxEvalFile.write("\n");
         }
-        System.out.println(evaluationOutput);
         maxEvalFile.write(Integer.toString(evaluationOutput));
         maxEvalFile.write("\n");
 
         maxEvalFile.close();
 }
 
+public void writeEvaluationArrayToFile(String filename, int[] evalValueArray, int evaluationOutput){
+        PrintWriter maxEvalFile = null;
+        try{
+          maxEvalFile = new PrintWriter(new FileWriter(filename, true));
+        }catch (IOException i) {
+          // TODO Auto-generated catch block
+          i.printStackTrace();
+        }
+        int arrayMaxSize = evalValueArray.length;
+        //System.out.println(arrayMaxSize);
+        for(int i =0; i < 50; i++)
+        {
+          for(int j = 0; j < 50; j++){
+        	 maxEvalFile.write(Integer.toString(evalValueArray[i + j]) +",");
+         }
+          maxEvalFile.write("\n");
+        }
+        maxEvalFile.write(Integer.toString(evaluationOutput));
+        maxEvalFile.write("\n");
+
+        maxEvalFile.close();
+}
 public void writeEvaluationArrayToFile(String filename, LinkedList<Integer> evalValueArray,LinkedList<Long> timeArray){
     PrintWriter maxEvalFile = null;
     PrintWriter maxTimeFile = null;
